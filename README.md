@@ -8,6 +8,8 @@
 
 ## Run it
 
+> 📖 New here? **[docs/RUNNING.md](docs/RUNNING.md)** is the full run guide (with troubleshooting). If the tax terms (1040, schedules, refund…) are unfamiliar, **[docs/TAX-FOR-ENGINEERS.md](docs/TAX-FOR-ENGINEERS.md)** explains the whole domain for a software engineer.
+
 ```bash
 ./run.sh
 # then open http://localhost:4200
@@ -81,7 +83,10 @@ Switch the client dropdown to **Robert Smith** for a second scenario (a *new* Sc
 
 Claude is layered on top for **plain-English “why it matters”** and **natural-language rule parsing**, and degrades to deterministic fallbacks when no key is present.
 
-See [`docs/SPEC.md`](docs/SPEC.md) for the full design (data model, detector rules, scoring formula, demo numbers).
+**Docs:**
+- [`docs/RUNNING.md`](docs/RUNNING.md) — how to run it, options, and troubleshooting
+- [`docs/TAX-FOR-ENGINEERS.md`](docs/TAX-FOR-ENGINEERS.md) — the tax domain (1040, schedules, refund/owe…) explained for a software engineer
+- [`docs/SPEC.md`](docs/SPEC.md) — full technical design (data model, detector rules, scoring formula, demo numbers)
 
 ---
 

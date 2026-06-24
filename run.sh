@@ -3,6 +3,9 @@
 set -e
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
+# Never let the Angular CLI's interactive analytics prompt block a non-interactive start.
+export NG_CLI_ANALYTICS=false
+
 echo "▸ Installing dependencies (first run only)…"
 (cd "$ROOT/backend" && npm install --silent)
 (cd "$ROOT/frontend" && npm install --silent)
