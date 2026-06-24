@@ -1,0 +1,39 @@
+{
+  "taxpayer_id": "SMITH",
+  "display_name": "Robert Smith",
+  "tax_year": 2024,
+  "header": {
+    "filing_status": "single",
+    "num_dependents": 0,
+    "num_qualifying_children_ctc": 0,
+    "deduction_method": "standard"
+  },
+  "forms": {
+    "1040": {
+      "present": true,
+      "lines": {
+        "1a": { "value": 93000 },
+        "2b": { "value": 250 },
+        "3b": { "value": 1800 },
+        "7": { "value": 0 },
+        "8": { "value": 15000 },
+        "9": { "value": 110050 },
+        "11": { "value": 108991 },
+        "12": { "value": 14600 },
+        "15": { "value": 94391 },
+        "16": { "value": 15819 },
+        "22": { "value": 15819 },
+        "23": { "value": 2119 },
+        "24": { "value": 17938 },
+        "25": { "value": 14500 },
+        "26": { "value": 0 },
+        "33": { "value": 14500 },
+        "34": { "value": 0 },
+        "37": { "value": 3438 }
+      }
+    },
+    "Schedule1": { "present": true, "lines": { "3": { "value": 15000 }, "15": { "value": 1059 } } },
+    "ScheduleC": { "present": true, "lines": { "1": { "value": 28000 }, "28": { "value": 13000 }, "31": { "value": 15000 } } },
+    "ScheduleSE": { "present": true, "lines": { "12": { "value": 2119 }, "13": { "value": 1059 } } }
+  }
+}
