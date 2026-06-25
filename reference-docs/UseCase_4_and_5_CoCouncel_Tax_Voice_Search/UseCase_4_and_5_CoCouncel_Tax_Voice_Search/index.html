@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hackathon Kit — Tech Docs</title>
+<style>
+  body { margin:0; background:#0f1626; color:#e6e9ef;
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; line-height:1.55; }
+  .wrap { max-width:680px; margin:0 auto; padding:36px 20px 60px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  .sub { color:#8a93a6; margin:0 0 28px; font-size:15px; }
+  .grid { display:grid; gap:14px; }
+  a.card { display:block; text-decoration:none; background:#141d30; border:1px solid #1c2740;
+    border-radius:12px; padding:18px 20px; color:#e6e9ef; transition:border-color .15s, transform .15s; }
+  a.card:hover { border-color:#2f6df6; transform:translateY(-2px); }
+  .card .pill { display:inline-block; background:#1c2740; color:#7fb0ff; font-size:11px; font-weight:700;
+    padding:2px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; }
+  .card h2 { font-size:18px; margin:2px 0 4px; }
+  .card p { margin:0; color:#9aa3b5; font-size:14px; }
+  .foot { color:#5a6478; font-size:13px; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🧰 Hackathon Kit — Tech Docs</h1>
+  <p class="sub">Reusable building blocks. Each doc is self-contained — use whichever your use case needs.</p>
+
+  <div class="grid">
+    <a class="card" href="01-tools-overview.html">
+      <span class="pill">Overview</span>
+      <h2>🧩 Tools &amp; Tech — what's in the kit</h2>
+      <p>New here? A one-page tour of VS Code, Cursor, Codex, LLMs, MCP, Whisper, Parakeet, and git — what each is and when to use it.</p>
+    </a>
+    <a class="card" href="02-architecture.html">
+      <span class="pill">Architecture</span>
+      <h2>🧭 Voice Pipeline Architecture</h2>
+      <p>The reference shape: capture → transcribe → answer() → panel. How the stages and docs fit together.</p>
+    </a>
+    <a class="card" href="07-workflow-diagram.html">
+      <span class="pill">Workflow</span>
+      <h2>🔁 Voice Workflow Diagram</h2>
+      <p>The full hands-free flow as a visual: speak → transcribe → understand → answer() → CoCounsel → cited answer. Great for walkthroughs.</p>
+    </a>
+    <a class="card" href="08-variance-alerts-workflow.html">
+      <span class="pill">Workflow</span>
+      <h2>🔔 Variance Alerts Workflow</h2>
+      <p>A push flow: set a rule by voice once, then it watches the return vs last year in the background and speaks up on anomalies. Reuses the voice layer.</p>
+    </a>
+    <a class="card" href="03-mcp.html">
+      <span class="pill">MCP</span>
+      <h2>🔌 Connect CoCounsel over MCP</h2>
+      <p>Wire CoCounsel into Cursor, Claude Desktop, or your own code. Configs, the JSON-RPC call flow, verify, troubleshooting.</p>
+    </a>
+    <a class="card" href="04-voice.html">
+      <span class="pill">Voice</span>
+      <h2>🎙 On-device Voice (STT + TTS)</h2>
+      <p>Capture speech and speak answers locally — faster-whisper, Parakeet, Kokoro, Piper. Models, setup, and approach.</p>
+    </a>
+    <a class="card" href="05-background.html">
+      <span class="pill">Background</span>
+      <h2>⏯ Run Scripts in the Background</h2>
+      <p>Keep a voice listener running during a demo — Windows PowerShell, macOS/Linux, tmux.</p>
+    </a>
+    <a class="card" href="06-prompts-faq.html">
+      <span class="pill">Prompts &amp; FAQ</span>
+      <h2>🗣 Sample Prompts &amp; FAQ</h2>
+      <p>Tested spoken questions to demo with, plus the pitfalls that trip teams up.</p>
+    </a>
+  </div>
+
+  <p class="foot">Building the app itself? See <code>../starter/</code> for the working voice scaffold.</p>
+</div>
+</body>
+</html>

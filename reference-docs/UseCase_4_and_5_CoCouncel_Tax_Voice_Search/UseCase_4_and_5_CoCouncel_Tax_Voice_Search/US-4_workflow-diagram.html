@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Workflow Diagram — Real-Time Tax Code Lookup (Voice)</title>
+<style>
+  body { margin:0; background:#0f1626; color:#e6e9ef;
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; line-height:1.55; }
+  .wrap { max-width:980px; margin:0 auto; padding:28px 20px 60px; }
+  .crumbs { font-size:13px; color:#8a93a6; margin:0 0 16px; }
+  .crumbs a { color:#7fb0ff; text-decoration:none; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:#8a93a6; margin:0 0 26px; font-size:14px; }
+  h2 { font-size:18px; margin:34px 0 8px; padding-top:14px; border-top:1px solid #1c2740; }
+  p { margin:8px 0; }
+  .pill { display:inline-block; background:#1c2740; color:#7fb0ff; font-size:11px; font-weight:700;
+    padding:2px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+  .diagram { background:#0a0f1c; border:1px solid #1c2740; border-radius:12px; padding:18px; margin:14px 0; overflow-x:auto; }
+  .hint { font-size:12.5px; color:#7fb0ff; margin:0 0 10px; }
+  code { background:#1c2740; padding:1px 6px; border-radius:5px; font-size:13px; }
+  .note { background:#101d33; border:1px solid #2f6df6; border-radius:10px; padding:14px 16px; margin:16px 0; }
+  .note b { color:#7fb0ff; }
+  .legend { display:flex; gap:18px; flex-wrap:wrap; font-size:13px; color:#9aa3b5; margin:6px 0 0; }
+  .legend span { display:inline-flex; align-items:center; gap:7px; }
+  .sw { width:13px; height:13px; border-radius:3px; display:inline-block; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { text-align:left; padding:9px 12px; border:1px solid #23304d; vertical-align:top; }
+  th { background:#1a2336; color:#cdd6f0; }
+
+  /* clickable nodes */
+  .node { cursor:pointer; }
+  .node rect { transition:stroke .15s, filter .15s; }
+  .node:hover rect { stroke:#cfe0ff; filter:drop-shadow(0 0 6px rgba(127,176,255,.5)); }
+
+  /* side panel */
+  #overlay { position:fixed; inset:0; background:rgba(4,8,18,.55); opacity:0; pointer-events:none;
+    transition:opacity .2s; z-index:10; }
+  #overlay.open { opacity:1; pointer-events:auto; }
+  #panel { position:fixed; top:0; right:0; height:100%; width:380px; max-width:88vw;
+    background:#0f1626; border-left:1px solid #23304d; box-shadow:-12px 0 40px rgba(0,0,0,.5);
+    transform:translateX(100%); transition:transform .22s ease; z-index:11; overflow-y:auto; }
+  #panel.open { transform:translateX(0); }
+  .ph { padding:22px 22px 14px; border-bottom:1px solid #1c2740; position:sticky; top:0; background:#0f1626; }
+  .ph .tag { font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+  .ph h3 { margin:8px 0 2px; font-size:21px; }
+  .ph .role { font-size:13px; color:#8a93a6; }
+  .pbody { padding:18px 22px 40px; }
+  .pbody h4 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#7fb0ff; margin:20px 0 6px; }
+  .pbody p { font-size:14px; color:#c7cedd; margin:6px 0; }
+  .pbody ul { margin:6px 0; padding-left:18px; }
+  .pbody li { font-size:13.5px; color:#c7cedd; margin:4px 0; }
+  .pbody .ex { background:#101d33; border-left:3px solid #2f6df6; border-radius:0 8px 8px 0;
+    padding:10px 14px; margin:8px 0; font-size:13.5px; color:#dbe3f4; font-style:italic; }
+  .closex { position:absolute; top:18px; right:18px; border:none; background:#1c2740; color:#cdd6f0;
+    width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:16px; line-height:1; }
+  .closex:hover { background:#2f6df6; color:#fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">← Tech docs</a> &nbsp;·&nbsp; <a href="08-variance-alerts-workflow.html">See also: Variance Alerts flow →</a></div>
+  <span class="pill">Workflow</span>
+  <h1>🔁 Real-Time Tax Code Lookup — Voice Workflow</h1>
+  <p class="sub">Starts and ends with the use case: a tax professional mid-return who needs a tax reference without leaving the workpaper. Audio stays on-device; only the question text leaves the machine.</p>
+
+  <h2>The flow</h2>
+  <p class="hint">👉 Click any box to open details.</p>
+  <div class="diagram">
+  <svg viewBox="0 0 960 530" width="100%" role="img" aria-label="Voice tax lookup workflow diagram" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#5b6b8c"/>
+      </marker>
+      <style>
+        .stage { fill:#141d30; stroke:#2f6df6; stroke-width:1.5; }
+        .cloud { fill:#101d33; stroke:#3a7d52; stroke-width:1.5; }
+        .uc    { fill:#1d1733; stroke:#8b6fd6; stroke-width:1.8; }
+        .num   { fill:#7fb0ff; font-size:12px; font-weight:700; }
+        .ucnum { fill:#b89bf0; font-size:12px; font-weight:700; }
+        .gnum  { fill:#7fd6a0; font-size:12px; font-weight:700; }
+        .ttl   { fill:#e6e9ef; font-size:14px; font-weight:700; }
+        .desc  { fill:#9aa3b5; font-size:11.5px; }
+        .flow  { fill:#8a93a6; font-size:11px; font-style:italic; }
+        .edge  { stroke:#5b6b8c; stroke-width:2; fill:none; }
+        .zone  { fill:#8a93a6; font-size:11px; font-weight:700; letter-spacing:.04em; }
+        .node text { pointer-events:none; }
+      </style>
+    </defs>
+
+    <!-- USE CASE anchor (start + return point) -->
+    <g class="node" onclick="openPanel('usecase')">
+      <rect x="40" y="196" width="172" height="132" rx="11" class="uc"/>
+      <text x="56" y="222" class="ucnum">★ USE CASE</text>
+      <text x="56" y="246" class="ttl">🧑‍💼 Tax professional</text>
+      <text x="56" y="266" class="desc">is filling out a</text>
+      <text x="56" y="282" class="desc">tax return and has</text>
+      <text x="56" y="298" class="desc">a quick tax question</text>
+      <text x="56" y="314" class="desc">— without stopping</text>
+    </g>
+
+    <!-- on-device zone -->
+    <rect x="246" y="40" width="694" height="150" rx="12" fill="#0d1626" stroke="#23304d" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="262" y="62" class="zone">🔒 ON YOUR MACHINE — audio never leaves the device</text>
+
+    <!-- 1 capture -->
+    <g class="node" onclick="openPanel('capture')">
+      <rect x="262" y="78" width="180" height="92" rx="10" class="stage"/>
+      <text x="276" y="100" class="num">1 · CAPTURE</text>
+      <text x="276" y="122" class="ttl">🎤 Speak</text>
+      <text x="276" y="142" class="desc">push-to-talk records</text>
+      <text x="276" y="158" class="desc">mic audio (16 kHz)</text>
+    </g>
+
+    <!-- 2 transcribe -->
+    <g class="node" onclick="openPanel('transcribe')">
+      <rect x="503" y="78" width="180" height="92" rx="10" class="stage"/>
+      <text x="517" y="100" class="num">2 · TRANSCRIBE</text>
+      <text x="517" y="122" class="ttl">📝 Speech → text</text>
+      <text x="517" y="142" class="desc">faster-whisper /</text>
+      <text x="517" y="158" class="desc">Parakeet, on-device</text>
+    </g>
+
+    <!-- 3 understand -->
+    <g class="node" onclick="openPanel('understand')">
+      <rect x="744" y="78" width="180" height="92" rx="10" class="stage"/>
+      <text x="758" y="100" class="num">3 · UNDERSTAND</text>
+      <text x="758" y="122" class="ttl">🧠 Add context</text>
+      <text x="758" y="142" class="desc">tax year, state,</text>
+      <text x="758" y="158" class="desc">prior question</text>
+    </g>
+
+    <!-- arrows row 1 -->
+    <line x1="442" y1="124" x2="503" y2="124" class="edge" marker-end="url(#arrow)"/>
+    <line x1="683" y1="124" x2="744" y2="124" class="edge" marker-end="url(#arrow)"/>
+
+    <!-- USE CASE -> CAPTURE (enter) -->
+    <path d="M212,234 L240,234 L240,124 L262,124" class="edge" marker-end="url(#arrow)"/>
+    <text x="250" y="216" class="flow" fill="#b89bf0">asks aloud</text>
+
+    <!-- UNDERSTAND down to seam -->
+    <path d="M834,170 L834,244" class="edge" marker-end="url(#arrow)"/>
+    <text x="844" y="212" class="flow">question (text only)</text>
+
+    <!-- 4 seam / route -->
+    <g class="node" onclick="openPanel('route')">
+      <rect x="744" y="244" width="180" height="74" rx="10" class="stage"/>
+      <text x="758" y="266" class="num">4 · ROUTE  ◀ seam</text>
+      <text x="758" y="288" class="ttl">answer(question)</text>
+      <text x="758" y="307" class="desc">single backend call</text>
+    </g>
+
+    <!-- backend zone -->
+    <rect x="246" y="354" width="694" height="150" rx="12" class="cloud"/>
+    <text x="262" y="376" class="zone" fill="#7fd6a0">☁️ BACKEND — grounded retrieval</text>
+
+    <!-- 5 retrieve -->
+    <g class="node" onclick="openPanel('retrieve')">
+      <rect x="744" y="392" width="180" height="74" rx="10" class="cloud"/>
+      <text x="758" y="414" class="gnum">5 · RETRIEVE</text>
+      <text x="758" y="436" class="ttl">🔎 CoCounsel (MCP)</text>
+      <text x="758" y="455" class="desc">IRC · IRS rulings · state</text>
+    </g>
+
+    <!-- seam down to retrieve -->
+    <path d="M834,318 L834,392" class="edge" marker-end="url(#arrow)"/>
+    <text x="844" y="360" class="flow">via npx mcp-remote</text>
+
+    <!-- retrieve back to show -->
+    <path d="M744,429 L442,429" class="edge" marker-end="url(#arrow)"/>
+    <text x="520" y="421" class="flow">grounded, cited source</text>
+
+    <!-- 6 show + speak -->
+    <g class="node" onclick="openPanel('show')">
+      <rect x="262" y="392" width="180" height="74" rx="10" class="stage"/>
+      <text x="276" y="414" class="num">6 · SHOW + SPEAK</text>
+      <text x="276" y="436" class="ttl">🔊 Answer + cite</text>
+      <text x="276" y="455" class="desc">panel + read aloud</text>
+    </g>
+
+    <!-- show -> USE CASE (loop back) -->
+    <path d="M262,429 L228,429 L228,300 L212,300" class="edge" marker-end="url(#arrow)"/>
+    <text x="84" y="356" class="flow" fill="#7fb0ff">↺ cited answer back —</text>
+    <text x="84" y="372" class="flow" fill="#7fb0ff">   stays in flow, ask a follow-up</text>
+  </svg>
+  </div>
+
+  <div class="legend">
+    <span><span class="sw" style="background:#1d1733;border:1.8px solid #8b6fd6"></span> Use case (the tax professional)</span>
+    <span><span class="sw" style="background:#141d30;border:1.5px solid #2f6df6"></span> Voice layer (in <code>starter/</code>)</span>
+    <span><span class="sw" style="background:#101d33;border:1.5px solid #3a7d52"></span> Your backend</span>
+  </div>
+
+  <div class="note"><b>It begins and ends with the use case.</b> The tax professional never leaves the
+  workpaper — they ask aloud and the cited answer comes back to them. Between those two
+  moments: everything before stage&nbsp;4 is the voice layer (given to you); everything after
+  is your backend, reached through one function — <code>answer(question)</code>. Swap what's
+  behind it (CoCounsel over MCP, a REST API, a local model) without touching the voice UI.
+  <b>No answer ships without a citation.</b></div>
+
+  <h2>Stage by stage</h2>
+  <table>
+    <tr><th>#</th><th>Stage</th><th>Does</th><th>Why it matters</th></tr>
+    <tr><td>★</td><td>Use case</td><td>A tax professional filling out a return has a quick tax question</td><td>The whole point — get the answer without stopping work</td></tr>
+    <tr><td>1</td><td>Capture</td><td>Push-to-talk records mic audio (16 kHz mono)</td><td>Hands-free — no tab switch</td></tr>
+    <tr><td>2</td><td>Transcribe</td><td>Audio → text, on-device</td><td>Tax terms (§, IRC, ruling numbers) stay private</td></tr>
+    <tr><td>3</td><td>Understand</td><td>Adds tax year, state, prior question</td><td>Enables "did this change <i>this year</i>?" + follow-ups</td></tr>
+    <tr><td>4</td><td>Route</td><td>One call — <code>answer(question)</code></td><td>The seam: same UI, any backend</td></tr>
+    <tr><td>5</td><td>Retrieve</td><td>Searches IRC / rulings / state regs via CoCounsel</td><td>Grounded source of truth, not guessed</td></tr>
+    <tr><td>6</td><td>Show + Speak</td><td>Renders answer + clickable cite, reads it aloud → back to the tax professional</td><td>Verifiable, drop straight into the workpaper</td></tr>
+  </table>
+</div>
+
+<!-- slide-in details panel -->
+<div id="overlay" onclick="closePanel()"></div>
+<aside id="panel" aria-hidden="true">
+  <div class="ph">
+    <button class="closex" onclick="closePanel()" aria-label="Close">✕</button>
+    <span class="tag" id="p-tag"></span>
+    <h3 id="p-title"></h3>
+    <div class="role" id="p-role"></div>
+  </div>
+  <div class="pbody" id="p-body"></div>
+</aside>
+
+<script>
+  const DETAILS = {
+    usecase: {
+      color:'#b89bf0', tag:'★ Use case', title:'🧑‍💼 The tax tax professional',
+      role:'Where it starts and ends',
+      html:`<p>A tax tax professional is filling out a client's return and hits a quick question — a rule, a limit, a deadline. Normally they'd stop, open a browser, search, read, and come back, losing their place.</p>
+        <h4>What changes</h4>
+        <p>They just ask out loud and keep working. The answer comes back to them — with a citation — and they stay in the workpaper the whole time.</p>
+        <h4>Example moment</h4>
+        <div class="ex">"What's the home office deduction rule?"</div>
+        <h4>Why it matters</h4>
+        <ul><li>Stays in flow — no tab-switching</li><li>Eliminates manual lookup during peak season</li><li>Fewer errors from misremembered tax code</li></ul>`
+    },
+    capture: {
+      color:'#7fb0ff', tag:'1 · Capture', title:'🎤 Speak',
+      role:'Voice layer · on your machine',
+      html:`<p>The tax professional holds a key (push-to-talk) and speaks the question. The microphone records short audio while the key is held.</p>
+        <h4>In plain terms</h4>
+        <p>Like holding a walkie-talkie button — it only listens when you ask it to, so stray talk and phone calls don't get sent.</p>
+        <h4>Under the hood</h4>
+        <ul><li><code>sounddevice</code> captures 16&nbsp;kHz mono audio</li><li>Push-to-talk trigger, not always-on</li><li>Runs on a background thread so the UI never freezes</li></ul>`
+    },
+    transcribe: {
+      color:'#7fb0ff', tag:'2 · Transcribe', title:'📝 Speech → text',
+      role:'Voice layer · on your machine',
+      html:`<p>The recorded audio is turned into text — the spoken question becomes a written question.</p>
+        <h4>In plain terms</h4>
+        <p>Like live captions on a video, done instantly and privately on your own laptop.</p>
+        <h4>Under the hood</h4>
+        <ul><li><code>faster-whisper</code> or NVIDIA <code>Parakeet</code></li><li>Runs fully on-device — the audio never leaves the machine</li><li>Tax terms (§, IRC, ruling numbers) stay private</li></ul>`
+    },
+    understand: {
+      color:'#7fb0ff', tag:'3 · Understand', title:'🧠 Add context',
+      role:'Voice layer · on your machine',
+      html:`<p>Before searching, the question is enriched with what matters for tax: which tax year, which state, and what was just asked.</p>
+        <h4>In plain terms</h4>
+        <p>So "did this change this year?" knows what <i>this year</i> means, and a follow-up doesn't have to repeat everything.</p>
+        <h4>Why it matters</h4>
+        <ul><li>Makes answers current (right tax year)</li><li>Handles state-specific rules</li><li>Supports natural follow-up questions</li></ul>`
+    },
+    route: {
+      color:'#7fb0ff', tag:'4 · Route', title:'answer(question)',
+      role:'The seam — one function call',
+      html:`<p>The text question is handed to a single function, <code>answer(question)</code>, which sends it to the backend and waits for a reply.</p>
+        <h4>Why this is the key piece</h4>
+        <p>The voice app only knows this one function. Behind it you can plug in <b>anything</b> — CoCounsel over MCP, a REST API, or a local model — without changing the voice UI at all.</p>
+        <h4>For builders</h4>
+        <div class="ex">answer(question) → text (with optional [label](https://…) citation links)</div>`
+    },
+    retrieve: {
+      color:'#7fd6a0', tag:'5 · Retrieve', title:'🔎 CoCounsel (MCP)',
+      role:'Your backend · grounded retrieval',
+      html:`<p>CoCounsel searches the real source material — the Internal Revenue Code, IRS rulings, publications, and state regulations — and returns an answer grounded in those sources.</p>
+        <h4>In plain terms</h4>
+        <p>Like an expert librarian who finds the exact page in the law book instead of guessing from memory.</p>
+        <h4>Under the hood</h4>
+        <ul><li>Reached over <b>MCP</b> via <code>npx mcp-remote</code></li><li>Returns the answer <b>with its citation</b></li><li>No citation found → it says so, never fabricates</li></ul>`
+    },
+    show: {
+      color:'#7fb0ff', tag:'6 · Show + Speak', title:'🔊 Answer + citation',
+      role:'Voice layer · back to the tax professional',
+      html:`<p>The answer appears in a floating panel with a clickable source, and is read aloud. Then it loops back to the tax professional — who never left the workpaper.</p>
+        <h4>In plain terms</h4>
+        <p>You hear the answer and see where it came from, so you can trust it or verify it — then drop the citation straight into your work and carry on.</p>
+        <h4>Under the hood</h4>
+        <ul><li>Always-on-top answer panel + clickable citations</li><li>Optional text-to-speech (Kokoro / Piper)</li><li>Ready for the next follow-up question</li></ul>`
+    }
+  };
+
+  const panel = document.getElementById('panel');
+  const overlay = document.getElementById('overlay');
+  function openPanel(key){
+    const d = DETAILS[key]; if(!d) return;
+    document.getElementById('p-tag').textContent = d.tag;
+    document.getElementById('p-tag').style.color = d.color;
+    document.getElementById('p-title').textContent = d.title;
+    document.getElementById('p-role').textContent = d.role;
+    document.getElementById('p-body').innerHTML = d.html;
+    panel.classList.add('open'); overlay.classList.add('open');
+    panel.setAttribute('aria-hidden','false');
+  }
+  function closePanel(){
+    panel.classList.remove('open'); overlay.classList.remove('open');
+    panel.setAttribute('aria-hidden','true');
+  }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
+</script>
+</body>
+</html>

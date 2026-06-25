@@ -1,0 +1,102 @@
+{
+  "_disclaimer": "SYNTHETIC hackathon data. Fictional entity, fake EIN. Not real taxpayer data. Do not file.",
+  "entity": {
+    "name": "Northwind Components Inc.",
+    "ein": "47-0000000",
+    "entity_type": "C corporation",
+    "form": "1120",
+    "industry": "Industrial sensor manufacturing",
+    "prior_year": 2024,
+    "current_year": 2025
+  },
+  "schema": {
+    "record": ["form", "schedule", "line_id", "label", "year", "value"],
+    "notes": "value is in whole USD. schedule is null for the main 1120 body. Use line_id to align years; fall back to fuzzy label match."
+  },
+  "line_items": [
+    {"form": "1120", "schedule": null, "line_id": "1a", "label": "Gross receipts or sales", "year": 2024, "value": 48200000},
+    {"form": "1120", "schedule": null, "line_id": "1a", "label": "Gross receipts or sales", "year": 2025, "value": 52800000},
+    {"form": "1120", "schedule": null, "line_id": "1b", "label": "Returns and allowances", "year": 2024, "value": 1150000},
+    {"form": "1120", "schedule": null, "line_id": "1b", "label": "Returns and allowances", "year": 2025, "value": 1260000},
+    {"form": "1120", "schedule": null, "line_id": "2", "label": "Cost of goods sold", "year": 2024, "value": 31400000},
+    {"form": "1120", "schedule": null, "line_id": "2", "label": "Cost of goods sold", "year": 2025, "value": 36900000},
+    {"form": "1120", "schedule": null, "line_id": "3", "label": "Gross profit", "year": 2024, "value": 15650000},
+    {"form": "1120", "schedule": null, "line_id": "3", "label": "Gross profit", "year": 2025, "value": 14640000},
+    {"form": "1120", "schedule": "C", "line_id": "4", "label": "Dividends", "year": 2024, "value": 85000},
+    {"form": "1120", "schedule": "C", "line_id": "4", "label": "Dividends", "year": 2025, "value": 92000},
+    {"form": "1120", "schedule": null, "line_id": "5", "label": "Interest income", "year": 2024, "value": 120000},
+    {"form": "1120", "schedule": null, "line_id": "5", "label": "Interest income", "year": 2025, "value": 310000},
+    {"form": "1120", "schedule": "D", "line_id": "8", "label": "Capital gain net income", "year": 2024, "value": 0},
+    {"form": "1120", "schedule": "D", "line_id": "8", "label": "Capital gain net income", "year": 2025, "value": 1400000},
+    {"form": "1120", "schedule": null, "line_id": "10", "label": "Other income", "year": 2024, "value": 240000},
+    {"form": "1120", "schedule": null, "line_id": "10", "label": "Other income", "year": 2025, "value": 180000},
+    {"form": "1120", "schedule": null, "line_id": "11", "label": "Total income", "year": 2024, "value": 16095000},
+    {"form": "1120", "schedule": null, "line_id": "11", "label": "Total income", "year": 2025, "value": 16622000},
+
+    {"form": "1120", "schedule": null, "line_id": "12", "label": "Compensation of officers", "year": 2024, "value": 1850000},
+    {"form": "1120", "schedule": null, "line_id": "12", "label": "Compensation of officers", "year": 2025, "value": 3650000},
+    {"form": "1120", "schedule": null, "line_id": "13", "label": "Salaries and wages", "year": 2024, "value": 6300000},
+    {"form": "1120", "schedule": null, "line_id": "13", "label": "Salaries and wages", "year": 2025, "value": 6750000},
+    {"form": "1120", "schedule": null, "line_id": "14", "label": "Repairs and maintenance", "year": 2024, "value": 410000},
+    {"form": "1120", "schedule": null, "line_id": "14", "label": "Repairs and maintenance", "year": 2025, "value": 445000},
+    {"form": "1120", "schedule": null, "line_id": "15", "label": "Bad debts", "year": 2024, "value": 95000},
+    {"form": "1120", "schedule": null, "line_id": "15", "label": "Bad debts", "year": 2025, "value": 540000},
+    {"form": "1120", "schedule": null, "line_id": "16", "label": "Rents", "year": 2024, "value": 720000},
+    {"form": "1120", "schedule": null, "line_id": "16", "label": "Rents", "year": 2025, "value": 740000},
+    {"form": "1120", "schedule": null, "line_id": "17", "label": "Taxes and licenses", "year": 2024, "value": 560000},
+    {"form": "1120", "schedule": null, "line_id": "17", "label": "Taxes and licenses", "year": 2025, "value": 610000},
+    {"form": "1120", "schedule": null, "line_id": "18", "label": "Interest expense", "year": 2024, "value": 380000},
+    {"form": "1120", "schedule": null, "line_id": "18", "label": "Interest expense", "year": 2025, "value": 1020000},
+    {"form": "1120", "schedule": null, "line_id": "19", "label": "Charitable contributions", "year": 2024, "value": 120000},
+    {"form": "1120", "schedule": null, "line_id": "19", "label": "Charitable contributions", "year": 2025, "value": 60000},
+    {"form": "1120", "schedule": null, "line_id": "20", "label": "Depreciation", "year": 2024, "value": 1450000},
+    {"form": "1120", "schedule": null, "line_id": "20", "label": "Depreciation", "year": 2025, "value": 1600000},
+    {"form": "1120", "schedule": null, "line_id": "22", "label": "Advertising", "year": 2024, "value": 510000},
+    {"form": "1120", "schedule": null, "line_id": "22", "label": "Advertising", "year": 2025, "value": 470000},
+    {"form": "1120", "schedule": null, "line_id": "23", "label": "Pension, profit-sharing plans", "year": 2024, "value": 430000},
+    {"form": "1120", "schedule": null, "line_id": "23", "label": "Pension, profit-sharing plans", "year": 2025, "value": 455000},
+    {"form": "1120", "schedule": null, "line_id": "24", "label": "Employee benefit programs", "year": 2024, "value": 980000},
+    {"form": "1120", "schedule": null, "line_id": "24", "label": "Employee benefit programs", "year": 2025, "value": 1040000},
+    {"form": "1120", "schedule": null, "line_id": "26", "label": "Other deductions", "year": 2024, "value": 1240000},
+    {"form": "1120", "schedule": null, "line_id": "26", "label": "Other deductions", "year": 2025, "value": 2980000},
+    {"form": "1120", "schedule": null, "line_id": "27", "label": "Total deductions", "year": 2024, "value": 15045000},
+    {"form": "1120", "schedule": null, "line_id": "27", "label": "Total deductions", "year": 2025, "value": 20360000},
+
+    {"form": "1120", "schedule": null, "line_id": "28", "label": "Taxable income before NOL and special deductions", "year": 2024, "value": 1050000},
+    {"form": "1120", "schedule": null, "line_id": "28", "label": "Taxable income before NOL and special deductions", "year": 2025, "value": -3738000},
+    {"form": "1120", "schedule": "J", "line_id": "31", "label": "Total income tax", "year": 2024, "value": 220500},
+    {"form": "1120", "schedule": "J", "line_id": "31", "label": "Total income tax", "year": 2025, "value": 0},
+    {"form": "6765", "schedule": null, "line_id": "GBC", "label": "Research credit (general business credit)", "year": 2024, "value": 620000},
+    {"form": "6765", "schedule": null, "line_id": "GBC", "label": "Research credit (general business credit)", "year": 2025, "value": 250000}
+  ],
+  "derived_ratios": {
+    "gross_margin": {"2024": 0.3326, "2025": 0.2841},
+    "officer_comp_to_revenue": {"2024": 0.0393, "2025": 0.0708},
+    "effective_tax_rate": {"2024": 0.21, "2025": 0.0}
+  },
+  "expected_flags": [
+    {"id": "F1", "severity": "critical", "type": "sign_flip", "line_id": "28", "summary": "Taxable income flipped from +1,050,000 to a 3,738,000 loss; first NOL in the series."},
+    {"id": "F2", "severity": "high", "type": "line_variance", "line_id": "12", "summary": "Officer compensation up 97% (1,850,000 to 3,650,000); reasonable-comp review."},
+    {"id": "F3", "severity": "high", "type": "line_variance", "line_id": "26", "summary": "Other deductions up 140% (1,240,000 to 2,980,000); composition / reclassification review."},
+    {"id": "F4", "severity": "high", "type": "credit_drop", "line_id": "GBC", "summary": "R&D credit down 60% (620,000 to 250,000)."},
+    {"id": "F5", "severity": "medium", "type": "line_variance", "line_id": "15", "summary": "Bad debts up 468% (95,000 to 540,000)."},
+    {"id": "F6", "severity": "medium", "type": "ratio", "metric": "gross_margin", "summary": "Gross margin down 4.9 pts while revenue rose 9.5% (COGS up 17.5%)."},
+    {"id": "F7", "severity": "medium", "type": "new_item", "line_id": "8", "summary": "New 1,400,000 capital gain; Schedule D not present in prior year."}
+  ],
+  "expected_noise": [
+    {"line_id": "13", "reason": "Salaries +7.1%, within band"},
+    {"line_id": "14", "reason": "Repairs +8.5%, within band"},
+    {"line_id": "16", "reason": "Rents +2.8%, within band"},
+    {"line_id": "17", "reason": "Taxes +8.9%, within band"},
+    {"line_id": "20", "reason": "Depreciation +10.3%, within band"},
+    {"line_id": "22", "reason": "Advertising -7.8%, within band"},
+    {"line_id": "23", "reason": "Pension +5.8%, within band"},
+    {"line_id": "24", "reason": "Benefits +6.1%, within band"},
+    {"line_id": "4", "reason": "Dividends +8.2%, within band"}
+  ],
+  "suggested_thresholds": {
+    "abs_usd": 250000,
+    "rel_pct": 0.15,
+    "rule": "flag when abs_delta >= abs_usd AND rel_delta >= rel_pct; always flag sign flips, new/missing lines, and ratio shifts >= 3 pts"
+  }
+}

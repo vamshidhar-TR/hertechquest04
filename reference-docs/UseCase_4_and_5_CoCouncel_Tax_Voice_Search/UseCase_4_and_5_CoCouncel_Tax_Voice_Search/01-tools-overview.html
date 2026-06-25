@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tech Doc — Tools & Tech Overview</title>
+<style>
+  body { margin:0; background:#0f1626; color:#e6e9ef;
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; line-height:1.55; }
+  .wrap { max-width:760px; margin:0 auto; padding:28px 20px 60px; }
+  .crumbs { font-size:13px; color:#8a93a6; margin:0 0 16px; }
+  .crumbs a { color:#7fb0ff; text-decoration:none; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:#8a93a6; margin:0 0 26px; font-size:14px; }
+  h2 { font-size:18px; margin:30px 0 8px; padding-top:14px; border-top:1px solid #1c2740; }
+  p { margin:8px 0; }
+  .pill { display:inline-block; background:#1c2740; color:#7fb0ff; font-size:11px; font-weight:700;
+    padding:2px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+  code { background:#1c2740; padding:1px 6px; border-radius:5px; font-size:13px; }
+  a { color:#7fb0ff; }
+  .note { background:#101d33; border:1px solid #2f6df6; border-radius:10px; padding:14px 16px; margin:18px 0; }
+  .note b { color:#7fb0ff; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { text-align:left; padding:9px 12px; border:1px solid #23304d; vertical-align:top; }
+  th { background:#1a2336; color:#cdd6f0; }
+  .tag { color:#9fe6c0; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">← Tech docs</a></div>
+  <span class="pill">Overview</span>
+  <h1>🧩 Tools &amp; Tech — what's in the kit</h1>
+  <p class="sub">New to the stack? This is the one-page tour. Each tool below is
+  optional — pick the ones your idea needs. Deeper how-tos are linked where they exist.</p>
+
+  <div class="note"><b>Big picture.</b> You build an app (often in an editor like
+  <b>VS Code</b> or <b>Cursor</b>), it turns speech into text with <b>Whisper</b> or
+  <b>Parakeet</b>, sends that text to an <b>LLM</b> / CoCounsel over <b>MCP</b>, and
+  your code lives in a <b>git repo</b>. You don't need all of them.</p>
+
+  <h2>At a glance</h2>
+  <table>
+    <tr><th>Tool</th><th>What it is</th><th>When you'd use it</th></tr>
+    <tr><td class="tag">VS Code</td><td>Free code editor from Microsoft.</td><td>Writing and running your app; default for most people.</td></tr>
+    <tr><td class="tag">Cursor</td><td>VS Code fork with a built-in AI assistant.</td><td>Same as VS Code, but with AI help and native MCP support.</td></tr>
+    <tr><td class="tag">Codex</td><td>OpenAI's coding assistant / CLI.</td><td>An alternative AI pair-programmer if you prefer it.</td></tr>
+    <tr><td class="tag">LLM</td><td>Large Language Model — the "brain" that answers in natural language.</td><td>Reasoning, drafting, summarizing; CoCounsel is an LLM-powered legal tool.</td></tr>
+    <tr><td class="tag">MCP</td><td>Model Context Protocol — a standard way for apps to call tools like CoCounsel.</td><td>Connecting your app or editor to CoCounsel.</td></tr>
+    <tr><td class="tag">Whisper</td><td>Speech-to-text model (we use faster-whisper, CPU-friendly).</td><td>Turning spoken questions into text, on-device.</td></tr>
+    <tr><td class="tag">Parakeet</td><td>NVIDIA speech-to-text model, highest accuracy.</td><td>Speech-to-text when you have an NVIDIA GPU.</td></tr>
+    <tr><td class="tag">git repo</td><td>Version-controlled folder of your code (Git / GitHub).</td><td>Saving, tracking, and sharing your project.</td></tr>
+  </table>
+
+  <h2>💻 VS Code</h2>
+  <p>A free, popular code editor. You'll open the project folder here, edit files, and
+  run commands in its built-in terminal. If you're unsure where to start, start here.
+  Download from <a href="https://code.visualstudio.com/">code.visualstudio.com</a>.</p>
+
+  <h2>🖱 Cursor</h2>
+  <p>A version of VS Code with an AI assistant baked in — it can explain code, write
+  code, and chat about your project. It also speaks <b>MCP</b> natively, so it's an
+  easy way to reach CoCounsel. See the <a href="03-mcp.html">MCP doc</a> (Option A).</p>
+
+  <h2>🤖 Codex</h2>
+  <p>OpenAI's AI coding assistant (available as a CLI / in some editors). It's an
+  alternative to Cursor's assistant for generating and editing code. Use whichever
+  AI helper you're comfortable with — none is required to finish the hackathon.</p>
+
+  <h2>🧠 LLM (Large Language Model)</h2>
+  <p>The technology behind tools like ChatGPT, Claude, and CoCounsel. You give it text
+  (a "prompt") and it responds in natural language. In this kit the LLM does the legal
+  reasoning — your app captures a question, the LLM/CoCounsel answers it with citations.</p>
+
+  <h2>🔌 MCP (Model Context Protocol)</h2>
+  <p>A shared "plug" standard that lets an app or editor call external tools — here,
+  CoCounsel's research tool. Set it up once and any MCP-aware client can use it.
+  Full setup, the call flow, and troubleshooting are in the <a href="03-mcp.html">MCP doc</a>.</p>
+
+  <h2>🎙 Whisper (faster-whisper)</h2>
+  <p>A speech-to-text model that turns recorded audio into text. We use
+  <b>faster-whisper</b> because it runs well on a normal CPU — no GPU needed. It's the
+  best default for capturing spoken questions. See the <a href="04-voice.html">Voice doc</a>.</p>
+
+  <h2>🦜 Parakeet</h2>
+  <p>NVIDIA's speech-to-text model — higher accuracy than Whisper but it prefers an
+  NVIDIA GPU and downloads a larger model. Use it if you have the hardware and want the
+  best transcription. Also covered in the <a href="04-voice.html">Voice doc</a>.</p>
+
+  <h2>🌿 git repo</h2>
+  <p>"Git" tracks every change to your code; a "repo" (repository) is the project folder
+  under that tracking. It lets you save snapshots (commits), undo mistakes, and share
+  with teammates (e.g. via GitHub). Common first commands:</p>
+  <p><code>git clone &lt;url&gt;</code> · <code>git status</code> · <code>git add .</code>
+  · <code>git commit -m "message"</code> · <code>git push</code></p>
+
+  <div class="note"><b>Not sure what to use?</b> A minimal path: open the project in
+  <b>VS Code</b>, use <b>Whisper</b> for speech, reach CoCounsel over <b>MCP</b>, and
+  keep your work in a <b>git repo</b>. Add the rest only if your idea calls for it.</div>
+</div>
+</body>
+</html>

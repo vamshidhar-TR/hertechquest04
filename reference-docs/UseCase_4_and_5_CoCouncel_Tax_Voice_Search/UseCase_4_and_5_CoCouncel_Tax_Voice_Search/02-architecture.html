@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tech Doc — Voice Pipeline Architecture</title>
+<style>
+  body { margin:0; background:#0f1626; color:#e6e9ef;
+    font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; line-height:1.55; }
+  .wrap { max-width:820px; margin:0 auto; padding:28px 20px 60px; }
+  .crumbs { font-size:13px; color:#8a93a6; margin:0 0 16px; }
+  .crumbs a { color:#7fb0ff; text-decoration:none; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:#8a93a6; margin:0 0 26px; font-size:14px; }
+  h2 { font-size:18px; margin:30px 0 8px; padding-top:14px; border-top:1px solid #1c2740; }
+  p { margin:8px 0; }
+  .pill { display:inline-block; background:#1c2740; color:#7fb0ff; font-size:11px; font-weight:700;
+    padding:2px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+  pre { background:#0a0f1c; color:#cdd6f0; border:1px solid #1c2740; border-radius:9px;
+    padding:16px; margin:10px 0; overflow-x:auto; font-size:12.5px; font-family:Consolas,monospace; line-height:1.45; }
+  pre.code { background:#000; color:#9fe6c0; }
+  .box { position:relative; }
+  .copy { position:absolute; top:8px; right:8px; border:none; cursor:pointer; background:#23304d;
+    color:#cdd6f0; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; }
+  .copy:hover { background:#2f6df6; color:#fff; }
+  code { background:#1c2740; padding:1px 6px; border-radius:5px; font-size:13px; }
+  .note { background:#101d33; border:1px solid #2f6df6; border-radius:10px; padding:14px 16px; margin:16px 0; }
+  .note b { color:#7fb0ff; }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { text-align:left; padding:9px 12px; border:1px solid #23304d; vertical-align:top; }
+  th { background:#1a2336; color:#cdd6f0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">← Tech docs</a></div>
+  <span class="pill">Architecture</span>
+  <h1>🧭 Voice Pipeline Architecture</h1>
+  <p class="sub">The reference shape for a hands-free voice → AI → answer app. Each stage maps to one of the other tech docs.</p>
+
+  <h2>The flow</h2>
+<pre>
+        ┌───────── on your machine (audio stays local) ─────────┐
+        │                                                       │
+  🎤 ──►│  1. CAPTURE        2. TRANSCRIBE        3. (edit)      │
+        │  sounddevice  ───► faster-whisper ────► question text │
+        │  push-to-talk      / Parakeet           (editable)    │
+        │                                            │          │
+        └────────────────────────────────────────────┼──────────┘
+                                                      │  question (text only)
+                                                      ▼
+                                          ┌───────────────────────┐
+                                          │  4. answer(question)   │  ← your seam
+                                          │     route to backend   │
+                                          └───────────┬───────────┘
+                                                      │  (live)
+                                                      ▼
+                              npx mcp-remote  ⇄  CoCounsel MCP server
+                                                      │  cited answer
+                                                      ▼
+        ┌──────────────────────────────────────────────────────┐
+        │  5. SHOW            6. (optional) SPEAK                │
+        │  answer panel  ◄──  + clickable sources   ──► TTS 🔊   │
+        │  always-on-top                              Kokoro/Piper│
+        └──────────────────────────────────────────────────────┘
+</pre>
+
+  <div class="note"><b>One seam to remember.</b> Everything left of stage 4 is the
+  voice layer (given to you in <code>starter/</code>). Everything right of it is your
+  backend, reached through a single function — <code>answer(question)</code>. Swap
+  what's behind it (CoCounsel over MCP, a REST API, a local model) without touching
+  the voice UI.</div>
+
+  <h2>Stage by stage</h2>
+  <table>
+    <tr><th>#</th><th>Stage</th><th>Does</th><th>Tech / doc</th></tr>
+    <tr><td>1</td><td>Capture</td><td>Record mic audio (16 kHz mono) on a push-to-talk or start/stop trigger</td><td>sounddevice — <a href="04-voice.html">Voice</a></td></tr>
+    <tr><td>2</td><td>Transcribe</td><td>Audio → text, on-device</td><td>faster-whisper / Parakeet — <a href="04-voice.html">Voice</a></td></tr>
+    <tr><td>3</td><td>Review</td><td>Show the text so the user can correct before sending</td><td>your UI</td></tr>
+    <tr><td>4</td><td>Route</td><td>Send the question to your backend, get an answer</td><td><code>answer()</code> — <a href="03-mcp.html">MCP</a></td></tr>
+    <tr><td>5</td><td>Show</td><td>Render the answer + clickable sources in a floating panel</td><td>your UI</td></tr>
+    <tr><td>6</td><td>Speak <span class="sub">(optional)</span></td><td>Read the answer back aloud</td><td>Kokoro / Piper — <a href="04-voice.html">Voice</a></td></tr>
+  </table>
+
+  <h2>Design choices that matter</h2>
+  <p><b>Audio stays local.</b> Capture + transcription run on-device; only the
+  question <i>text</i> leaves the machine. Keeps client/privileged speech private.</p>
+  <p><b>Push-to-talk, not always-on.</b> Capture only when asked, so stray speech and
+  phone calls don't get sent to the backend.</p>
+  <p><b>Transcription on background threads.</b> Inference is slow relative to the UI
+  — run capture, transcription, and the backend call off the UI thread and post
+  results back, or the window freezes.</p>
+  <p><b>The answer() seam is the whole point.</b> The UI only knows
+  <code>answer(question) → text</code>. That indirection is what lets every team
+  point the same app at a different backend.</p>
+
+  <h2>Minimal contract between stages</h2>
+  <div class="box"><button class="copy" onclick="cp(this)">Copy</button><pre class="code">audio:    np.float32 mono, 16 kHz, range [-1, 1]
+   ▼ transcribe(audio) -> str
+question: plain text (user may edit)
+   ▼ answer(question) -> str        # markdown links become clickable sources
+answer:   text (+ optional [label](https://…) links)</pre></div>
+</div>
+<script>
+  function cp(b){ const t=b.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(t).then(()=>{const o=b.textContent;b.textContent='Copied!';
+    setTimeout(()=>b.textContent=o,1200);}); }
+</script>
+</body>
+</html>
