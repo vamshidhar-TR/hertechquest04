@@ -5,11 +5,21 @@ import { VarianceStore } from '../core/variance.store';
 interface Row {
   path: string;
   line: string;
+  ref: string;
   label: string;
   prior: number | null;
   current: number | null;
   edited: boolean;
   finding?: Finding;
+}
+
+/** Derive the IRS line reference from an official line_items key, where one exists. */
+function lineRef(key: string): string {
+  const m = key.match(/_1040_([0-9]+[a-z]?)$/);
+  if (m) return m[1]; // 1a, 2b, 3b, 16, 23 …
+  if (/_8283$/.test(key)) return '8283';
+  if (/_8829$/.test(key)) return '8829';
+  return '—'; // schedule-detail lines aren't numbered in the source data
 }
 
 @Component({
@@ -28,6 +38,7 @@ interface Row {
 
     <div class="grid-head">
       <span></span>
+      <span class="g-line">Line</span>
       <span class="g-desc">Description</span>
       <span class="g-num">TY{{ store.taxYears().prior }} (filed)</span>
       <span class="g-num">TY{{ store.taxYears().current }} (working)</span>
@@ -41,6 +52,7 @@ interface Row {
               <span class="dot" [style.background]="dotColor(row.finding)" [title]="row.finding!.tier"></span>
             }
           </span>
+          <span class="c-line mono">{{ row.ref }}</span>
           <span class="c-desc">{{ row.label }}</span>
           <span class="c-prior mono">{{ fmt(row.prior) }}</span>
           <span class="c-cur">
@@ -118,7 +130,7 @@ interface Row {
       }
       .grid-head {
         display: grid;
-        grid-template-columns: 22px minmax(0, 1fr) 150px 150px;
+        grid-template-columns: 22px 54px minmax(0, 1fr) 150px 150px;
         gap: 0;
         padding: 9px 14px 9px 10px;
         font-size: 10.5px;
@@ -138,7 +150,7 @@ interface Row {
       }
       .row {
         display: grid;
-        grid-template-columns: 22px minmax(0, 1fr) 150px 150px;
+        grid-template-columns: 22px 54px minmax(0, 1fr) 150px 150px;
         align-items: center;
         padding: 0 14px 0 10px;
         height: 38px;
@@ -161,6 +173,13 @@ interface Row {
         width: 9px;
         height: 9px;
         border-radius: 50%;
+      }
+      .c-line {
+        font-size: 12px;
+        color: var(--ink-faint);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .c-desc {
         font-size: 13px;
@@ -267,6 +286,7 @@ export class ReturnGridComponent {
       return {
         path,
         line,
+        ref: lineRef(line),
         label: entry?.label ?? `Line ${line}`,
         prior: prior?.forms[form]?.lines[line]?.value ?? null,
         current: overridden ? ov[path] : seedCurrent,
