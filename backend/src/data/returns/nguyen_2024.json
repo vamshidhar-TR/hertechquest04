@@ -1,0 +1,49 @@
+{
+  "_meta": {
+    "disclaimer": "FICTIONAL / SYNTHETIC DATA — not real taxpayer data. Invented for demo and testing only.",
+    "role": "PRIOR YEAR baseline. Self-employed (Schedule C) sole proprietor."
+  },
+  "client": {
+    "name": "Nguyen, Linh",
+    "client_id": "DEMO-1040-0002",
+    "filing_status": "Single",
+    "preparer": "Demo Tax Pro"
+  },
+  "demographics": {
+    "taxpayer_age": 41,
+    "dependents": 0,
+    "state": "CA",
+    "taxpayer_occupation": "Freelance graphic designer"
+  },
+  "tax_year": 2024,
+  "form": "1040",
+  "forms_present": ["1040", "Schedule C", "Schedule SE", "Form 8829"],
+  "line_items": {
+    "gross_receipts_sch_c": 88000,
+    "returns_allowances_sch_c": 0,
+    "cost_of_goods_sold_sch_c": 12000,
+    "gross_profit_sch_c": 76000,
+    "advertising_sch_c": 3000,
+    "car_and_truck_sch_c": 4200,
+    "supplies_sch_c": 2600,
+    "contract_labor_sch_c": 0,
+    "home_office_8829": 1800,
+    "total_expenses_sch_c": 11600,
+    "net_profit_sch_c": 64400,
+    "self_employment_tax_sch_se": 9100,
+    "se_tax_deduction_sch1": 4550,
+    "total_income": 64400,
+    "adjusted_gross_income": 59850,
+    "qbi_deduction_1040_13": 11030,
+    "standard_deduction": 14600,
+    "taxable_income": 34220,
+    "income_tax_1040_16": 3900,
+    "total_credits": 0,
+    "self_employment_tax_other": 9100,
+    "total_tax": 13000,
+    "federal_withholding": 0,
+    "estimated_payments": 15000,
+    "total_payments": 15000,
+    "refund_or_due": 2000
+  }
+}

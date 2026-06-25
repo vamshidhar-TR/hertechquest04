@@ -15,7 +15,10 @@ import { AlertCardComponent } from './alert-card.component';
         @if (store.scanning()) {<span class="scanning"><span class="spin"></span> scanning…</span>}
         <span class="spacer"></span>
         @if (voice.ttsSupported) {
-          <button class="speaker" (click)="readAloud()" title="Read the top issue aloud">🔊</button>
+          <button class="hf" [class.on]="store.handsFree()" (click)="store.handsFree.set(!store.handsFree())" title="Speak new alerts automatically">
+            {{ store.handsFree() ? '🔊 Hands-free' : '🔇 Muted' }}
+          </button>
+          <button class="speaker" (click)="store.speakSummary()" title="Replay the spoken summary">↺</button>
         }
       </div>
       <div class="counts">
@@ -97,13 +100,27 @@ import { AlertCardComponent } from './alert-card.component';
       .spacer {
         flex: 1;
       }
+      .hf {
+        border: 1px solid var(--border-strong);
+        background: var(--surface-2);
+        color: var(--ink-soft);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .hf.on {
+        color: var(--cc);
+        border-color: var(--cc);
+        background: var(--cc-soft);
+      }
       .speaker {
         border: 1px solid var(--border-strong);
         background: var(--surface-2);
         border-radius: 8px;
         width: 30px;
         height: 28px;
-        font-size: 13px;
+        font-size: 15px;
       }
       .counts {
         margin-top: 8px;
@@ -198,14 +215,4 @@ export class AlertsPanelComponent {
     return f === 'ALL' ? list : list.filter((x) => x.tier === f);
   });
 
-  readAloud(): void {
-    const list = this.store.findings();
-    if (!list.length) return;
-    const top = list[0];
-    const crit = this.store.tierCount('CRITICAL');
-    const high = this.store.tierCount('HIGH');
-    const intro = `On the ${this.store.displayName()} return, I found ${crit} critical and ${high} high-priority issues. The most important: ${top.label}.`;
-    const why = top.explanation?.why_short ?? top.reasons[0] ?? '';
-    this.voice.speak(`${intro} ${why}`);
-  }
 }

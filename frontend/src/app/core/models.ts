@@ -57,12 +57,17 @@ export interface RegistryEntry {
   role: LineRole;
   flags?: string[];
 }
+export interface Citation {
+  label: string;
+  url?: string;
+}
 export interface Explanation {
   finding_id?: string;
   why_short: string;
   why_full?: string;
   suggested_action?: string;
   related_lines?: string[];
+  citation?: Citation;
 }
 export interface Finding {
   finding_id: string;
@@ -107,9 +112,16 @@ export interface ReturnPairResponse {
   taxpayer_id: string;
   display_name: string;
   tax_years: { prior: number; current: number };
+  years?: number[];
+  planted_anomalies?: string[];
   prior: TaxReturn;
   current: TaxReturn;
   line_registry: RegistryEntry[];
+}
+export interface AskResponse {
+  answer: string;
+  citation?: Citation;
+  answered_via: 'claude' | 'deterministic';
 }
 export interface ParseRuleResponse {
   ruleset: RuleSet;
@@ -132,14 +144,15 @@ export interface HealthResponse {
 /** Form tab metadata (mirror of backend FORM_META). */
 export const FORM_META: Record<string, { label: string; short: string; order: number }> = {
   '1040': { label: 'Form 1040', short: '1040', order: 0 },
-  Schedule1: { label: 'Schedule 1', short: 'Sch 1', order: 1 },
+  Schedule1: { label: 'Schedule 1 — Adjustments', short: 'Sch 1', order: 1 },
   ScheduleA: { label: 'Schedule A — Itemized', short: 'Sch A', order: 2 },
   ScheduleB: { label: 'Schedule B — Interest & Dividends', short: 'Sch B', order: 3 },
   ScheduleC: { label: 'Schedule C — Business', short: 'Sch C', order: 4 },
   ScheduleD: { label: 'Schedule D — Capital Gains', short: 'Sch D', order: 5 },
   ScheduleE: { label: 'Schedule E — Rental/Pass-through', short: 'Sch E', order: 6 },
   ScheduleSE: { label: 'Schedule SE — Self-Employment Tax', short: 'Sch SE', order: 7 },
-  Schedule8812: { label: 'Schedule 8812 — Child Tax Credit', short: 'Sch 8812', order: 8 },
+  Form8283: { label: 'Form 8283 — Noncash Charitable', short: '8283', order: 8 },
+  Form8829: { label: 'Form 8829 — Home Office', short: '8829', order: 9 },
 };
 
 export const TIER_META: Record<Tier, { label: string; color: string; bg: string; icon: string }> = {

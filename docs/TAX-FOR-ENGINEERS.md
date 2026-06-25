@@ -33,9 +33,12 @@ The person (or family) whose return is being filled out. A professional **tax pr
 accountant) does this for *many* clients. **The user of our app is the preparer**, switching between
 clients with the top-bar dropdown.
 
-Our two synthetic clients (made-up — no real data):
-- **Michael & Sarah Johnson** — a married couple with two kids.
-- **Robert Smith** — a single filer.
+The hackathon ships **5 fictional clients** (made-up — no real data), each with two consecutive years:
+- **Johnson** (married couple) — a charitable drop + two dropped forms.
+- **Nguyen** (self-employed) — a business-income spike + a missing home-office form.
+- **Patel** (rental owner) — a rental that was sold (one line drops to $0).
+- **Garcia** (single) — a *normal* year → should raise **zero** alerts (a control to prove we don't over-flag).
+- **Thompson** (3 years) — a phased retirement, for multi-year comparison.
 
 ## Form 1040 — the main form (the "root object")
 
@@ -89,10 +92,10 @@ Schedule A (itemized total)   ──►  1040 line 12 (deduction)
 Schedule 8812 (child credit)  ──►  1040 line 19 (credit)
 ```
 
-That's why, when the Johnson return is **missing Schedule C**, our tool doesn't fire five separate
-alerts (income gone, SE tax gone, Schedule SE gone, …). It **rolls the whole cascade into one card** —
-because in the dependency graph, they all trace back to one root cause. (See the consolidation logic
-in `backend/src/engine/rank.ts` and the relationships in `backend/src/registry.ts`.)
+That dependency graph is why one root cause (a dropped schedule, a forgotten form) can move several
+lines at once. The engine keeps the panel tight with **materiality ranking** (biggest issues float to
+the top), a **suppression cutoff** (trivial noise hidden), and **per-line dedupe** — which is also why
+the **Garcia "normal year" control produces zero alerts**. (See `backend/src/engine/rank.ts`.)
 
 ## Refund vs. owe (the bottom line)
 
@@ -138,21 +141,21 @@ that flags regressions before merge** — with severity levels and a plain-Engli
 
 ## The Johnson demo, decoded
 
-**Last year**, the Johnsons had: Michael's salary + Sarah's small design business (Schedule C) +
-some investments + two kids → a **$4,440 refund**.
+**Last year (TY2024)**, the Johnsons reported interest & dividends (on Schedule B), a noncash charitable
+gift (on Form 8283), and a $5,000 cash donation → a **$4,900 refund**.
 
-**This year** (work in progress), whoever started the return made several silent mistakes:
+**This year (TY2025, in progress)**, whoever started the return made several silent mistakes:
 
 | What went wrong | What our tool catches |
 |---|---|
-| ❌ Forgot Sarah's whole business | **Schedule C is missing** — $18,500 income gone, plus its self-employment tax |
-| ❌ Entered only 1 of 4 dividend statements | **Dividends −86%** ($3,400 → $480) |
-| ❌ Forgot the $7,500 charity donation | **Dropped deduction** ($7,500 → $0) |
-| ❌ Marked only 1 of 2 kids for the child credit | **Child credit halved** ($4,000 → $2,000) — an off-by-one |
-| 🟥 Net effect | The **$4,440 refund became "$1,746 owed"** — the loud symptom |
+| ❌ Dropped the whole interest/dividends schedule | **Schedule B is missing** — those $4,100 of income gone |
+| ❌ Didn't carry over the noncash donation form | **Form 8283 is missing** — $4,000 deduction no longer reported |
+| ❌ Left the qualified dividends blank | **Dividends vanished** ($3,600 → $0) |
+| ❌ Entered $500 instead of $5,000 charity | **Charitable cash −90%** — money left on the table (cites IRS Pub 526) |
+| 🟦 Downstream | itemized total down, refund down — the visible symptoms |
 
-And it deliberately **does NOT** nag about Michael's wages rising 11% — that's a normal raise, shown
-quietly as blue **"Info."** Knowing what *not* to bother the preparer with is what makes it usable.
+Switch to **Garcia** (a normal year) and the panel stays **empty** — proving the tool doesn't cry wolf.
+That false-positive control is exactly why the kit ships a "clean" client.
 
 ---
 
@@ -180,8 +183,9 @@ quietly as blue **"Info."** Knowing what *not* to bother the preparer with is wh
 
 ## Want to connect it to the code?
 
-- The synthetic returns: [`backend/src/data/johnson.2023.json`](../backend/src/data/johnson.2023.json) and `johnson.2024.json`.
-- Which lines exist and how they relate: [`backend/src/registry.ts`](../backend/src/registry.ts).
+- The official synthetic returns: [`backend/src/data/returns/`](../backend/src/data/returns/) (e.g. `johnson_2024.json`, `johnson_2025.json`).
+- The adapter (official schema → our model): [`backend/src/data/adapter.ts`](../backend/src/data/adapter.ts).
+- Which lines exist and which form each belongs to: [`backend/src/registry.ts`](../backend/src/registry.ts).
 - The diff (detectors): [`backend/src/engine/detect.ts`](../backend/src/engine/detect.ts).
-- The scoring + consolidation: [`backend/src/engine/rank.ts`](../backend/src/engine/rank.ts).
-- Full technical design: [`SPEC.md`](SPEC.md).
+- The scoring + ranking: [`backend/src/engine/rank.ts`](../backend/src/engine/rank.ts).
+- What the hackathon wants: [`HACKATHON-BRIEF.md`](HACKATHON-BRIEF.md) · Full design: [`SPEC.md`](SPEC.md).

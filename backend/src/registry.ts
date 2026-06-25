@@ -1,130 +1,150 @@
 /**
- * Static line registry + year-specific tax constants.
+ * Static line registry + year-specific tax constants — keyed to the OFFICIAL hackathon
+ * sample-data schema (flat `line_items` keys like `charitable_cash_sch_a`, `wages_1040_1a`).
  *
- * Input return data carries ONLY values. Everything semantic — labels, roles, behavioural
- * flags — lives here, so the detection engine is data-driven and the seed data stays clean.
+ * Input data carries only values + a `forms_present` list. Everything semantic — which form a
+ * line belongs to, its label, its role, behavioural flags — lives here, so the detection engine
+ * stays data-driven. canonical_path is `<form>.<key>` (form derived from the key's suffix).
  */
 import type { FilingStatus, LineRole, RegistryEntry } from '../../shared/types.js';
 
-/** Behavioural flags that change how a line is scored / detected. */
 export type LineFlag =
-  | 'always_material' // bypasses min_abs suppression
+  | 'always_material'
   | 'carryover' // capital-loss carryover — silently dropped is dangerous
   | 'depreciation' // "allowed or allowable" — silently dropped is dangerous
-  | 'sign_outcome' // profit/loss or gain/loss line — eligible for sign_flip
-  | 'return_outcome' // the refund / amount-owed result lines
-  | 'no_emit'; // pure computed total — used for ratios/sign but never flagged directly
+  | 'sign_outcome' // profit/loss, gain/loss, or refund/owe — eligible for sign_flip
+  | 'no_emit'; // pure computed total — used for context but never flagged directly
 
-interface RawEntry {
-  path: string; // "form.line"
+interface RawLine {
+  key: string; // the official line_items key
+  form: string; // normalized form id
   label: string;
   role: LineRole;
   flags?: LineFlag[];
-  /** This line duplicates the economic value of another (suppress its findings, keep the target). */
-  mirror_of?: string;
 }
 
-const RAW: RawEntry[] = [
+/** Normalize an official forms_present entry ("Schedule A", "Form 8283") to a form id. */
+export function normalizeForm(name: string): string {
+  return name.replace(/\s+/g, '');
+}
+
+/** Fallback: derive a form id from a line_items key's suffix (for any key not in the table). */
+export function formFromKey(key: string): string {
+  if (key.endsWith('_sch_se')) return 'ScheduleSE';
+  if (key.endsWith('_sch_c')) return 'ScheduleC';
+  if (key.endsWith('_sch_e')) return 'ScheduleE';
+  if (key.endsWith('_sch_a')) return 'ScheduleA';
+  if (key.endsWith('_sch_b')) return 'ScheduleB';
+  if (key.endsWith('_sch_d')) return 'ScheduleD';
+  if (key.endsWith('_sch1')) return 'Schedule1';
+  if (key.endsWith('_8283')) return 'Form8283';
+  if (key.endsWith('_8829')) return 'Form8829';
+  return '1040';
+}
+
+const RAW: RawLine[] = [
   // ---- Form 1040 ----
-  { path: '1040.1a', label: 'Wages (W-2 box 1)', role: 'income' },
-  { path: '1040.2b', label: 'Taxable interest', role: 'income' },
-  { path: '1040.3b', label: 'Ordinary dividends', role: 'income' },
-  { path: '1040.7', label: 'Capital gain / (loss)', role: 'income', flags: ['sign_outcome'] },
-  { path: '1040.8', label: 'Additional income (Schedule 1)', role: 'income' },
-  { path: '1040.9', label: 'Total income', role: 'total', flags: ['no_emit'] },
-  { path: '1040.11', label: 'Adjusted gross income', role: 'total', flags: ['no_emit'] },
-  { path: '1040.12', label: 'Standard/Itemized deduction', role: 'deduction' },
-  { path: '1040.15', label: 'Taxable income', role: 'total', flags: ['no_emit'] },
-  { path: '1040.16', label: 'Tax', role: 'tax' },
-  { path: '1040.19', label: 'Child tax credit / ODC', role: 'credit' },
-  { path: '1040.22', label: 'Tax after credits', role: 'tax', flags: ['no_emit'] },
-  { path: '1040.23', label: 'Other taxes incl. SE tax (Schedule 2)', role: 'tax' },
-  { path: '1040.24', label: 'Total tax', role: 'tax', flags: ['no_emit'] },
-  { path: '1040.25', label: 'Federal income tax withheld', role: 'payment' },
-  { path: '1040.26', label: 'Estimated tax payments', role: 'payment' },
-  { path: '1040.33', label: 'Total payments', role: 'payment', flags: ['no_emit'] },
-  { path: '1040.34', label: 'Overpayment / refund', role: 'result', flags: ['return_outcome', 'always_material'] },
-  { path: '1040.37', label: 'Amount you owe', role: 'result', flags: ['return_outcome', 'always_material'] },
+  { key: 'wages_1040_1a', form: '1040', label: 'Wages (W-2 box 1)', role: 'income' },
+  { key: 'total_income_wages_only', form: '1040', label: 'Total income (wages only)', role: 'total', flags: ['no_emit'] },
+  { key: 'tax_exempt_interest_1040_2a', form: '1040', label: 'Tax-exempt interest', role: 'income' },
+  { key: 'taxable_interest_1040_2b', form: '1040', label: 'Taxable interest', role: 'income' },
+  { key: 'qualified_dividends_1040_3a', form: '1040', label: 'Qualified dividends', role: 'income' },
+  { key: 'ordinary_dividends_1040_3b', form: '1040', label: 'Ordinary dividends', role: 'income' },
+  { key: 'ira_distributions_1040_4b', form: '1040', label: 'IRA distributions (taxable)', role: 'income' },
+  { key: 'pension_annuity_1040_5b', form: '1040', label: 'Pensions & annuities (taxable)', role: 'income' },
+  { key: 'social_security_taxable_1040_6b', form: '1040', label: 'Social Security (taxable)', role: 'income' },
+  { key: 'total_income', form: '1040', label: 'Total income', role: 'total', flags: ['no_emit'] },
+  { key: 'adjusted_gross_income', form: '1040', label: 'Adjusted gross income', role: 'total', flags: ['no_emit'] },
+  { key: 'standard_deduction', form: '1040', label: 'Standard deduction', role: 'deduction' },
+  { key: 'qbi_deduction_1040_13', form: '1040', label: 'Qualified business income deduction', role: 'deduction' },
+  { key: 'taxable_income', form: '1040', label: 'Taxable income', role: 'total', flags: ['no_emit'] },
+  { key: 'income_tax_1040_16', form: '1040', label: 'Income tax', role: 'tax' },
+  { key: 'child_tax_credit', form: '1040', label: 'Child tax credit', role: 'credit' },
+  { key: 'education_credits', form: '1040', label: 'Education credits', role: 'credit' },
+  { key: 'total_credits', form: '1040', label: 'Total credits', role: 'credit', flags: ['no_emit'] },
+  { key: 'other_taxes_1040_23', form: '1040', label: 'Other taxes', role: 'tax' },
+  { key: 'total_tax', form: '1040', label: 'Total tax', role: 'tax', flags: ['no_emit'] },
+  { key: 'federal_withholding', form: '1040', label: 'Federal income tax withheld', role: 'payment' },
+  { key: 'estimated_payments', form: '1040', label: 'Estimated tax payments', role: 'payment' },
+  { key: 'total_payments', form: '1040', label: 'Total payments', role: 'payment', flags: ['no_emit'] },
+  { key: 'refund_or_due', form: '1040', label: 'Refund / amount due', role: 'result', flags: ['sign_outcome', 'always_material'] },
 
-  // ---- Schedule 1 (additional income & adjustments) ----
-  { path: 'Schedule1.3', label: 'Business income (Schedule C)', role: 'income', mirror_of: '1040.8' },
-  { path: 'Schedule1.5', label: 'Rental/royalty/S-corp (Schedule E)', role: 'income', flags: ['sign_outcome'] },
-  { path: 'Schedule1.15', label: 'Deductible part of SE tax', role: 'deduction' },
+  // ---- Schedule 1 (adjustments) ----
+  { key: 'ira_deduction_sch1', form: 'Schedule1', label: 'IRA deduction', role: 'deduction' },
+  { key: 'hsa_deduction_sch1', form: 'Schedule1', label: 'HSA deduction', role: 'deduction' },
+  { key: 'student_loan_interest_sch1', form: 'Schedule1', label: 'Student loan interest', role: 'deduction' },
+  { key: 'se_tax_deduction_sch1', form: 'Schedule1', label: 'Deductible part of SE tax', role: 'deduction' },
+  { key: 'total_adjustments_sch1', form: 'Schedule1', label: 'Total adjustments', role: 'total', flags: ['no_emit'] },
 
-  // ---- Schedule A (itemized deductions) ----
-  { path: 'ScheduleA.5e', label: 'State & local taxes (SALT, capped)', role: 'deduction' },
-  { path: 'ScheduleA.8e', label: 'Home mortgage interest', role: 'deduction' },
-  { path: 'ScheduleA.11', label: 'Gifts to charity', role: 'deduction' },
-  { path: 'ScheduleA.17', label: 'Total itemized deductions', role: 'subtotal', mirror_of: '1040.12' },
+  // ---- Schedule A (itemized) ----
+  { key: 'medical_expenses_sch_a', form: 'ScheduleA', label: 'Medical expenses', role: 'deduction' },
+  { key: 'state_local_taxes_sch_a', form: 'ScheduleA', label: 'State & local taxes (SALT)', role: 'deduction' },
+  { key: 'mortgage_interest_sch_a', form: 'ScheduleA', label: 'Home mortgage interest', role: 'deduction' },
+  { key: 'charitable_cash_sch_a', form: 'ScheduleA', label: 'Charitable contributions (cash)', role: 'deduction' },
+  { key: 'total_itemized_deductions_sch_a', form: 'ScheduleA', label: 'Total itemized deductions', role: 'subtotal' },
+
+  // ---- Form 8283 (noncash charitable) ----
+  { key: 'charitable_noncash_8283', form: 'Form8283', label: 'Charitable contributions (noncash)', role: 'deduction' },
 
   // ---- Schedule B (interest & dividends) ----
-  { path: 'ScheduleB.2', label: 'Total taxable interest', role: 'income', mirror_of: '1040.2b' },
-  { path: 'ScheduleB.6', label: 'Total ordinary dividends', role: 'income', mirror_of: '1040.3b' },
+  { key: 'taxable_interest_sch_b', form: 'ScheduleB', label: 'Taxable interest', role: 'income' },
+  { key: 'ordinary_dividends_sch_b', form: 'ScheduleB', label: 'Ordinary dividends', role: 'income' },
 
-  // ---- Schedule C (business profit/loss) ----
-  { path: 'ScheduleC.1', label: 'Gross receipts', role: 'income' },
-  { path: 'ScheduleC.28', label: 'Total expenses', role: 'deduction' },
-  { path: 'ScheduleC.31', label: 'Net business profit / (loss)', role: 'income', flags: ['sign_outcome'] },
+  // ---- Schedule C (business) ----
+  { key: 'gross_receipts_sch_c', form: 'ScheduleC', label: 'Gross receipts', role: 'income' },
+  { key: 'returns_allowances_sch_c', form: 'ScheduleC', label: 'Returns & allowances', role: 'income' },
+  { key: 'cost_of_goods_sold_sch_c', form: 'ScheduleC', label: 'Cost of goods sold', role: 'deduction' },
+  { key: 'gross_profit_sch_c', form: 'ScheduleC', label: 'Gross profit', role: 'subtotal' },
+  { key: 'advertising_sch_c', form: 'ScheduleC', label: 'Advertising', role: 'deduction' },
+  { key: 'car_and_truck_sch_c', form: 'ScheduleC', label: 'Car & truck expenses', role: 'deduction' },
+  { key: 'contract_labor_sch_c', form: 'ScheduleC', label: 'Contract labor', role: 'deduction' },
+  { key: 'supplies_sch_c', form: 'ScheduleC', label: 'Supplies', role: 'deduction' },
+  { key: 'total_expenses_sch_c', form: 'ScheduleC', label: 'Total expenses', role: 'subtotal' },
+  { key: 'net_profit_sch_c', form: 'ScheduleC', label: 'Net business profit / (loss)', role: 'income', flags: ['sign_outcome'] },
 
-  // ---- Schedule D (capital gains & losses) ----
-  { path: 'ScheduleD.6', label: 'Short-term loss carryover', role: 'deduction', flags: ['carryover', 'always_material'] },
-  { path: 'ScheduleD.14', label: 'Long-term loss carryover', role: 'deduction', flags: ['carryover', 'always_material'] },
-  { path: 'ScheduleD.16', label: 'Net capital gain / (loss)', role: 'income', flags: ['sign_outcome'] },
+  // ---- Form 8829 (home office) ----
+  { key: 'home_office_8829', form: 'Form8829', label: 'Home office deduction', role: 'deduction' },
 
-  // ---- Schedule E (rental / royalty / pass-through) ----
-  { path: 'ScheduleE.18', label: 'Depreciation expense', role: 'deduction', flags: ['depreciation', 'always_material'] },
-  { path: 'ScheduleE.26', label: 'Total rental/pass-through income / (loss)', role: 'income', flags: ['sign_outcome'] },
+  // ---- Schedule D (capital gains) ----
+  { key: 'capital_gains_sch_d', form: 'ScheduleD', label: 'Capital gain / (loss)', role: 'income', flags: ['sign_outcome'] },
+
+  // ---- Schedule E (rental / pass-through) ----
+  { key: 'rents_received_prop_a_sch_e', form: 'ScheduleE', label: 'Rents received — property A', role: 'income' },
+  { key: 'rents_received_prop_b_sch_e', form: 'ScheduleE', label: 'Rents received — property B', role: 'income' },
+  { key: 'total_rents_received_sch_e', form: 'ScheduleE', label: 'Total rents received', role: 'subtotal' },
+  { key: 'rental_mortgage_interest_sch_e', form: 'ScheduleE', label: 'Rental mortgage interest', role: 'deduction' },
+  { key: 'rental_repairs_sch_e', form: 'ScheduleE', label: 'Rental repairs', role: 'deduction' },
+  { key: 'rental_depreciation_sch_e', form: 'ScheduleE', label: 'Rental depreciation', role: 'deduction', flags: ['depreciation'] },
+  { key: 'total_rental_expenses_sch_e', form: 'ScheduleE', label: 'Total rental expenses', role: 'subtotal' },
+  { key: 'net_rental_income_sch_e', form: 'ScheduleE', label: 'Net rental income / (loss)', role: 'income', flags: ['sign_outcome'] },
 
   // ---- Schedule SE (self-employment tax) ----
-  { path: 'ScheduleSE.12', label: 'Self-employment tax', role: 'tax' },
-  { path: 'ScheduleSE.13', label: 'Deduction for half of SE tax', role: 'deduction', mirror_of: 'Schedule1.15' },
-
-  // ---- Schedule 8812 (Child Tax Credit) ----
-  { path: 'Schedule8812.14', label: 'Child tax credit', role: 'credit', mirror_of: '1040.19' },
+  { key: 'self_employment_tax_sch_se', form: 'ScheduleSE', label: 'Self-employment tax', role: 'tax' },
+  { key: 'self_employment_tax_other', form: 'ScheduleSE', label: 'Self-employment tax (other)', role: 'tax' },
 ];
 
-export const LINE_REGISTRY: RegistryEntry[] = RAW.map((r) => {
-  const [form, line] = splitPath(r.path);
-  return { canonical_path: r.path, form, line, label: r.label, role: r.role, flags: r.flags };
-});
+const BY_KEY = new Map<string, RawLine>(RAW.map((r) => [r.key, r]));
+
+/** The form a known line key belongs to (registry first, then suffix heuristic). */
+export function formForKey(key: string): string {
+  return BY_KEY.get(key)?.form ?? formFromKey(key);
+}
+
+/** Canonical path for an official line key: "<form>.<key>". */
+export function pathForKey(key: string): string {
+  return `${formForKey(key)}.${key}`;
+}
+
+export const LINE_REGISTRY: RegistryEntry[] = RAW.map((r) => ({
+  canonical_path: `${r.form}.${r.key}`,
+  form: r.form,
+  line: r.key,
+  label: r.label,
+  role: r.role,
+  flags: r.flags,
+}));
 
 const REGISTRY_MAP = new Map<string, RegistryEntry>(LINE_REGISTRY.map((e) => [e.canonical_path, e]));
-
-/** path -> the summary line it duplicates. Findings on the mirror are suppressed in favour of the target. */
-export const LINE_MIRRORS: Record<string, string> = Object.fromEntries(
-  RAW.filter((r) => r.mirror_of).map((r) => [r.path, r.mirror_of as string]),
-);
-
-/**
- * Schedules feed values onto 1040/Schedule-1 summary lines. When a schedule goes MISSING,
- * findings on the lines it fed are rolled into the missing-schedule finding (as context),
- * not reported separately — so "Schedule C gone" and "$18,500 income vanished" become one card.
- */
-export const SCHEDULE_FEEDS: Record<string, string[]> = {
-  ScheduleC: ['1040.8'],
-  ScheduleE: ['Schedule1.5'],
-  ScheduleSE: ['1040.23', 'Schedule1.15'],
-};
-
-/** A dependent schedule's missing-finding merges into its parent's (no Sch C ⇒ no Sch SE). */
-export const SCHEDULE_DEPENDS_ON: Record<string, string> = {
-  ScheduleSE: 'ScheduleC',
-};
-
-/**
- * Forms that never trigger a missing/new SCHEDULE finding. Schedule 1 is a pure aggregator —
- * its lines mirror/feed 1040 lines, so its appearance/disappearance is always a consequence of
- * an underlying income/adjustment change we already catch on the 1040.
- */
-export const PRESENCE_EXEMPT_FORMS = new Set<string>(['Schedule1']);
-
-export function mirrorOf(path: string): string | undefined {
-  return LINE_MIRRORS[path];
-}
-
-export function isNoEmit(path: string): boolean {
-  return hasFlag(path, 'no_emit');
-}
 
 export function splitPath(path: string): [string, string] {
   const idx = path.indexOf('.');
@@ -140,7 +160,10 @@ export function getRegistryEntry(path: string): RegistryEntry | undefined {
 }
 
 export function labelFor(path: string): string {
-  return REGISTRY_MAP.get(path)?.label ?? path;
+  const e = REGISTRY_MAP.get(path);
+  if (e) return e.label;
+  const [, line] = splitPath(path);
+  return line || path;
 }
 
 export function roleFor(path: string): LineRole {
@@ -155,30 +178,49 @@ export function hasFlag(path: string, flag: LineFlag): boolean {
   return flagsFor(path).includes(flag);
 }
 
-/** Everything that isn't the master 1040 form is a "schedule" for missing/new detection. */
 export function isSchedule(form: string): boolean {
   return form !== '1040';
 }
 
-// ---- Return-outcome & sign-outcome anchors used by the engine ----
-export const OUTCOME_REFUND = '1040.34';
-export const OUTCOME_OWED = '1040.37';
-/** Lines whose sign (profit/loss, gain/loss) is meaningful. */
-export const SIGN_OUTCOME_PATHS = LINE_REGISTRY.filter((e) => (e.flags ?? []).includes('sign_outcome')).map(
-  (e) => e.canonical_path,
-);
+export function isNoEmit(path: string): boolean {
+  return hasFlag(path, 'no_emit');
+}
+
+// Relationships are intentionally empty for the official schema (the reference comparison is a
+// straight line-by-line + missing-form diff; our scoring/tiers/AI/voice layer on top of it).
+export const LINE_MIRRORS: Record<string, string> = {};
+export function mirrorOf(path: string): string | undefined {
+  return LINE_MIRRORS[path];
+}
+export const SCHEDULE_FEEDS: Record<string, string[]> = {};
+export const SCHEDULE_DEPENDS_ON: Record<string, string> = {};
+/** Schedule 1 is a curated aggregator that the official forms_present list omits — never flag it as a missing schedule. */
+export const PRESENCE_EXEMPT_FORMS = new Set<string>(['Schedule1']);
+
+/** Representative line per schedule, used to size a missing/new-schedule finding. */
+export const SCHEDULE_PRIMARY: Record<string, string> = {
+  ScheduleA: 'total_itemized_deductions_sch_a',
+  ScheduleB: 'ordinary_dividends_sch_b',
+  ScheduleC: 'net_profit_sch_c',
+  ScheduleD: 'capital_gains_sch_d',
+  ScheduleE: 'net_rental_income_sch_e',
+  ScheduleSE: 'self_employment_tax_sch_se',
+  Form8283: 'charitable_noncash_8283',
+  Form8829: 'home_office_8829',
+};
 
 // ---- Form display metadata (drives the frontend tab strip) ----
 export const FORM_META: Record<string, { label: string; short: string; order: number }> = {
   '1040': { label: 'Form 1040', short: '1040', order: 0 },
-  Schedule1: { label: 'Schedule 1', short: 'Sch 1', order: 1 },
+  Schedule1: { label: 'Schedule 1 — Adjustments', short: 'Sch 1', order: 1 },
   ScheduleA: { label: 'Schedule A — Itemized', short: 'Sch A', order: 2 },
   ScheduleB: { label: 'Schedule B — Interest & Dividends', short: 'Sch B', order: 3 },
   ScheduleC: { label: 'Schedule C — Business', short: 'Sch C', order: 4 },
   ScheduleD: { label: 'Schedule D — Capital Gains', short: 'Sch D', order: 5 },
   ScheduleE: { label: 'Schedule E — Rental/Pass-through', short: 'Sch E', order: 6 },
   ScheduleSE: { label: 'Schedule SE — Self-Employment Tax', short: 'Sch SE', order: 7 },
-  Schedule8812: { label: 'Schedule 8812 — Child Tax Credit', short: 'Sch 8812', order: 8 },
+  Form8283: { label: 'Form 8283 — Noncash Charitable', short: '8283', order: 8 },
+  Form8829: { label: 'Form 8829 — Home Office', short: '8829', order: 9 },
 };
 
 export function formLabel(form: string): string {
@@ -191,7 +233,6 @@ export interface TaxConstants {
   standard_deduction: Record<FilingStatus, number>;
   salt_cap: number;
   salt_cap_mfs: number;
-  /** EITC is disallowed if investment income exceeds this (inflation-indexed). */
   eitc_investment_limit: number;
   ctc_per_child: number;
   ctc_phaseout_single: number;
@@ -201,21 +242,18 @@ export interface TaxConstants {
 export const TAX_CONSTANTS: Record<number, TaxConstants> = {
   2023: {
     standard_deduction: { single: 13850, MFJ: 27700, MFS: 13850, HOH: 20800, QW: 27700 },
-    salt_cap: 10000,
-    salt_cap_mfs: 5000,
-    eitc_investment_limit: 11000,
-    ctc_per_child: 2000,
-    ctc_phaseout_single: 200000,
-    ctc_phaseout_mfj: 400000,
+    salt_cap: 10000, salt_cap_mfs: 5000, eitc_investment_limit: 11000,
+    ctc_per_child: 2000, ctc_phaseout_single: 200000, ctc_phaseout_mfj: 400000,
   },
   2024: {
     standard_deduction: { single: 14600, MFJ: 29200, MFS: 14600, HOH: 21900, QW: 29200 },
-    salt_cap: 10000,
-    salt_cap_mfs: 5000,
-    eitc_investment_limit: 11600,
-    ctc_per_child: 2000,
-    ctc_phaseout_single: 200000,
-    ctc_phaseout_mfj: 400000,
+    salt_cap: 10000, salt_cap_mfs: 5000, eitc_investment_limit: 11600,
+    ctc_per_child: 2000, ctc_phaseout_single: 200000, ctc_phaseout_mfj: 400000,
+  },
+  2025: {
+    standard_deduction: { single: 15000, MFJ: 30000, MFS: 15000, HOH: 22500, QW: 30000 },
+    salt_cap: 10000, salt_cap_mfs: 5000, eitc_investment_limit: 11950,
+    ctc_per_child: 2000, ctc_phaseout_single: 200000, ctc_phaseout_mfj: 400000,
   },
 };
 
@@ -223,21 +261,15 @@ export function standardDeduction(year: number, status: FilingStatus): number | 
   return TAX_CONSTANTS[year]?.standard_deduction[status];
 }
 
-/** Ratio / consistency definitions consumed by the ratio_proportion_anomaly detector. */
 export interface RatioDef {
   key: string;
   label: string;
   numerator: string;
   denominator: string;
-  /** relative-shift threshold to flag (default 0.30). */
   threshold?: number;
-  /** optional hard upper bound that, if crossed, always flags. */
   hardMax?: number;
 }
 
-export const RATIO_DEFS: RatioDef[] = [
-  { key: 'deduction_to_agi', label: 'Deductions ÷ AGI', numerator: '1040.12', denominator: '1040.11', hardMax: 0.9 },
-  { key: 'effective_rate', label: 'Effective tax rate', numerator: '1040.24', denominator: '1040.15' },
-  { key: 'withholding_to_income', label: 'Withholding ÷ total income', numerator: '1040.25', denominator: '1040.9' },
-  { key: 'charity_to_agi', label: 'Charitable gifts ÷ AGI', numerator: 'ScheduleA.11', denominator: '1040.11' },
-];
+// Ratios are off by default for the official data so the Garcia control stays clean; the engine's
+// explicit detectors (variance, missing/new form, within-form drop, sign flip) cover the planted set.
+export const RATIO_DEFS: RatioDef[] = [];

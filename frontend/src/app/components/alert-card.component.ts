@@ -1,5 +1,7 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FORM_META, TIER_META, fmtMoney, type Finding } from '../core/models';
+import { VarianceStore } from '../core/variance.store';
+import { VoiceService } from '../core/voice.service';
 import { SeverityBadgeComponent } from './severity-badge.component';
 import { DeltaChipComponent } from './delta-chip.component';
 
@@ -46,11 +48,34 @@ const TYPE_LABEL: Record<string, string> = {
           }
         </div>
 
+        @if (f().explanation?.citation; as cite) {
+          <div class="cite">
+            <span class="src">Source</span>
+            @if (cite.url) {
+              <a [href]="cite.url" target="_blank" rel="noopener">{{ cite.label }}</a>
+            } @else {
+              <span>{{ cite.label }}</span>
+            }
+          </div>
+        }
+
+        @if (askAnswer()) {
+          <div class="ask-answer">
+            <span class="q">🎤 “{{ lastQuestion() }}”</span>
+            <span class="a">{{ askAnswer() }}</span>
+          </div>
+        }
+
         <div class="actions">
           <button class="ghost" (click)="jump.emit(f().canonical_path)">Jump to line</button>
           <button class="ghost" (click)="expanded.set(!expanded())">
             {{ expanded() ? 'Less' : 'Why it matters' }}
           </button>
+          @if (voice.sttSupported) {
+            <button class="ghost ask" [class.live]="asking()" (click)="onAsk()">
+              {{ asking() ? '● listening…' : '🎤 Ask' }}
+            </button>
+          }
         </div>
 
         @if (expanded()) {
@@ -199,6 +224,57 @@ const TYPE_LABEL: Record<string, string> = {
         margin: 3px 0;
         font-size: 12px;
       }
+      .cite {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .cite .src {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--info);
+        background: var(--info-bg);
+        border-radius: 4px;
+        padding: 1px 6px;
+      }
+      .cite a {
+        color: var(--info);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .cite a:hover {
+        text-decoration: underline;
+      }
+      .ask-answer {
+        margin-top: 10px;
+        padding: 9px 11px;
+        background: var(--cc-soft);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        animation: cc-fade-in 0.2s ease both;
+      }
+      .ask-answer .q {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--cc);
+      }
+      .ask-answer .a {
+        font-size: 13px;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+      .ask.live {
+        color: var(--crit);
+        border-color: var(--crit);
+        background: var(--crit-bg);
+      }
     `,
   ],
 })
@@ -207,7 +283,32 @@ export class AlertCardComponent {
   isNew = input<boolean>(false);
   jump = output<string>();
 
+  store = inject(VarianceStore);
+  voice = inject(VoiceService);
+
   expanded = signal(false);
+  asking = signal(false);
+  askAnswer = signal<string | null>(null);
+  lastQuestion = signal('');
+
+  async onAsk(): Promise<void> {
+    if (this.asking()) {
+      this.voice.stop();
+      this.asking.set(false);
+      return;
+    }
+    this.asking.set(true);
+    try {
+      const q = await this.voice.listen();
+      this.lastQuestion.set(q);
+      const res = await this.store.ask(this.f(), q);
+      this.askAnswer.set(res.answer);
+    } catch {
+      /* ignore (cancelled / unsupported) */
+    } finally {
+      this.asking.set(false);
+    }
+  }
 
   stripe = computed(() => TIER_META[this.f().tier].color);
   typeLabel = computed(() => TYPE_LABEL[this.f().anomaly_type] ?? this.f().anomaly_type);

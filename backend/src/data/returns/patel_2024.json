@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "disclaimer": "FICTIONAL / SYNTHETIC DATA — not real taxpayer data. Invented for demo and testing only.",
+    "role": "PRIOR YEAR baseline. Two rental properties (Schedule E)."
+  },
+  "client": {
+    "name": "Patel, Amit & Priya",
+    "client_id": "DEMO-1040-0003",
+    "filing_status": "Married Filing Jointly",
+    "preparer": "Demo Tax Pro"
+  },
+  "demographics": {
+    "taxpayer_age": 48,
+    "spouse_age": 46,
+    "dependents": 1,
+    "state": "TX",
+    "taxpayer_occupation": "Physician",
+    "spouse_occupation": "Consultant"
+  },
+  "tax_year": 2024,
+  "form": "1040",
+  "forms_present": ["1040", "Schedule A", "Schedule E"],
+  "line_items": {
+    "wages_1040_1a": 168000,
+    "total_income_wages_only": 168000,
+    "rents_received_prop_a_sch_e": 24000,
+    "rents_received_prop_b_sch_e": 18000,
+    "total_rents_received_sch_e": 42000,
+    "rental_repairs_sch_e": 3500,
+    "rental_mortgage_interest_sch_e": 11000,
+    "rental_depreciation_sch_e": 9000,
+    "total_rental_expenses_sch_e": 23500,
+    "net_rental_income_sch_e": 18500,
+    "total_income": 186500,
+    "adjusted_gross_income": 186500,
+    "medical_expenses_sch_a": 0,
+    "state_local_taxes_sch_a": 10000,
+    "mortgage_interest_sch_a": 12500,
+    "charitable_cash_sch_a": 2000,
+    "total_itemized_deductions_sch_a": 24500,
+    "taxable_income": 162000,
+    "income_tax_1040_16": 27600,
+    "total_credits": 0,
+    "total_tax": 27600,
+    "federal_withholding": 26000,
+    "estimated_payments": 0,
+    "total_payments": 26000,
+    "refund_or_due": -1600
+  }
+}

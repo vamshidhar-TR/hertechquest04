@@ -1,5 +1,13 @@
 # CoCounsel — Automated Return-to-Return Variance Alerts
 
+> **⚠️ Alignment note.** This is the *original* engine/UX design. After the hackathon's official kit
+> arrived, the app was aligned to the **official sample-data schema** (flat `line_items` + `forms_present`,
+> 5 clients incl. a Garcia control) and the **voice-first** framing. The detector taxonomy, materiality
+> scoring, API, and component design below all still apply; what changed is the **input schema** (now
+> mapped by `backend/src/data/adapter.ts`), the **clients/demo**, and added **voice follow-up + citations**.
+> For the current intent, data, tools, and gap analysis, read **[HACKATHON-BRIEF.md](HACKATHON-BRIEF.md)**.
+> §1 (data model) and §7 (demo) below describe the original synthetic data and are superseded by the brief.
+
 **Hackathon Use Case 5.** CoCounsel monitors a current-year (work-in-progress) individual Form 1040 return against the taxpayer's prior-year return and proactively surfaces anomalies *before* the return goes to review — variances over a configurable threshold (default 20%), missing schedules, dropped deductions, sign flips, and vanished income — each explained in plain English and ranked by materiality so the preparer isn't drowned in noise.
 
 > Voice/NL config: *"Flag anything on the Johnson return more than 20% different from last year, and tell me what's missing."*

@@ -86,11 +86,18 @@ export interface ScoreBreakdown {
   risk_weight: number;
 }
 
+export interface Citation {
+  label: string;
+  url?: string;
+}
+
 export interface Explanation {
   why_short: string;
   why_full?: string;
   suggested_action?: string;
   related_lines?: string[];
+  /** Source the preparer can trust — the relevant IRS form/Pub. */
+  citation?: Citation;
 }
 
 export interface Finding {
@@ -164,6 +171,10 @@ export interface ReturnPairResponse {
   taxpayer_id: string;
   display_name: string;
   tax_years: { prior: number; current: number };
+  /** all tax years on file for this client (>2 means multiple comparisons are possible). */
+  years?: number[];
+  /** the planted anomalies declared in the current-year file's _meta (demo aid). */
+  planted_anomalies?: string[];
   prior: TaxReturn;
   current: TaxReturn;
   line_registry: RegistryEntry[];
@@ -177,6 +188,8 @@ export interface ScanSummary {
 
 export interface ScanRequest {
   taxpayer_id: string;
+  /** which current-year to compare (for multi-year clients); defaults to the latest. */
+  current_year?: number;
   /** edited current-year line values from the grid: { "1040.1a": 158000, ... } or partial TaxReturn. */
   current_override?: Record<string, number | null> | Partial<TaxReturn>;
   ruleset?: Partial<RuleSet>;
@@ -226,4 +239,17 @@ export interface HealthResponse {
   claude_available: boolean;
   registry_version: string;
   available_taxpayers: string[];
+}
+
+/** Voice follow-up about one flagged line ("why?", "what was it last year?", "is there a rule?"). */
+export interface AskRequest {
+  taxpayer_id: string;
+  finding: Finding;
+  question: string;
+}
+
+export interface AskResponse {
+  answer: string;
+  citation?: Citation;
+  answered_via: 'claude' | 'deterministic';
 }

@@ -54,15 +54,16 @@ Then open **http://localhost:4200**.
 
 ## What you should see
 
-The **Johnson** client loads automatically with **9 ranked alerts** in the right-hand panel:
-a missing Schedule C, a refund→owe flip, a dropped charity deduction, a halved child credit, and more.
-Try these:
+The **Johnson** client (the kit's official sample) loads automatically with **6 ranked alerts** in the
+right-hand panel: a **missing Schedule B**, a **missing Form 8283**, vanished dividends, a charitable-cash
+collapse, and downstream effects. Try these:
 
+- **Toggle 🔊 Hands-free** (top of the panel) and click **Analyze** → the app *speaks* the ranked summary aloud.
+- **Click 🎤 Ask** on a card → say *"what was it last year?"* or *"is there a rule?"* → it answers aloud, with the **IRS citation** shown.
 - **Drag the threshold slider** (bottom bar) up to 30% → lower-priority flags drop off live.
-- **Click "Why it matters"** on any card → plain-English explanation + suggested action.
-- **Click "Jump to line"** → the left grid scrolls to and highlights that line.
-- **Switch the client dropdown** (top bar) to *Robert Smith* → a different scenario.
-- **Type in the bottom bar** (or click 🎤): *"Flag anything on the Johnson return more than 20% different from last year, and tell me what's missing"* → click **Analyze**.
+- **Click "Why it matters"** → plain-English explanation + suggested action + source citation. **"Jump to line"** highlights it in the grid.
+- **Switch the client dropdown** (top bar): **Garcia** → *zero alerts* (the control); **Nguyen / Patel / Thompson** → other scenarios. **Thompson** shows a **year-pair picker** (3 years on file).
+- **Type in the bottom bar** (or click 🎤): *"Flag anything on the Johnson return more than 20% different from last year, and tell me what's missing"* → **Analyze**.
 
 ---
 
@@ -125,14 +126,16 @@ solution/
 ├── run.sh                     # starts both servers
 ├── README.md                  # overview + the demo script
 ├── docs/
+│   ├── HACKATHON-BRIEF.md     # what the hackathon wants + tools + gap analysis
 │   ├── RUNNING.md             # (this file)
 │   ├── TAX-FOR-ENGINEERS.md   # the tax domain, explained for a software engineer
 │   └── SPEC.md                # full technical design
 ├── shared/types.ts            # the API contract, used by both ends
 ├── backend/                   # Node + Express + TypeScript
 │   └── src/
-│       ├── registry.ts        # which tax lines exist + how they relate
-│       ├── data/*.json        # synthetic returns (Johnson, Smith)
+│       ├── registry.ts        # which tax lines exist + which form each belongs to
+│       ├── data/returns/      # the kit's 5 official synthetic clients (JSON)
+│       ├── data/adapter.ts    # official schema → internal model
 │       ├── engine/            # detect.ts (the diff) + rank.ts (the scoring)
 │       ├── nlparse.ts         # natural-language → rule
 │       └── explain.ts         # "why it matters" text

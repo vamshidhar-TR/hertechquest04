@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import type {
+  AskResponse,
   ExplainResponse,
   Finding,
   HealthResponse,
@@ -24,16 +25,26 @@ export class ApiService {
     return this.http.get<{ taxpayers: { taxpayer_id: string; display_name: string }[] }>(`${this.base}/taxpayers`);
   }
 
-  getReturns(taxpayerId: string): Observable<ReturnPairResponse> {
-    return this.http.get<ReturnPairResponse>(`${this.base}/returns/${taxpayerId}`);
+  getReturns(taxpayerId: string, year?: number): Observable<ReturnPairResponse> {
+    const q = year ? `?year=${year}` : '';
+    return this.http.get<ReturnPairResponse>(`${this.base}/returns/${taxpayerId}${q}`);
   }
 
   scan(req: {
     taxpayer_id: string;
+    current_year?: number;
     current_override?: Record<string, number | null>;
     ruleset?: Partial<RuleSet>;
   }): Observable<ScanResponse> {
     return this.http.post<ScanResponse>(`${this.base}/scan`, req);
+  }
+
+  ask(taxpayerId: string, finding: Finding, question: string): Observable<AskResponse> {
+    return this.http.post<AskResponse>(`${this.base}/ask`, {
+      taxpayer_id: taxpayerId,
+      finding,
+      question,
+    });
   }
 
   parseRule(text: string, loadedTaxpayerIds: string[]): Observable<ParseRuleResponse> {

@@ -16,6 +16,7 @@ import {
   PRESENCE_EXEMPT_FORMS,
   RATIO_DEFS,
   roleFor,
+  SCHEDULE_PRIMARY,
   splitPath,
   standardDeduction,
 } from '../registry.js';
@@ -76,17 +77,6 @@ function isDisabled(rs: RuleSet, path: string, type: AnomalyType): boolean {
   if (rs.enabled_types !== 'all' && !rs.enabled_types.includes(type)) return true;
   return false;
 }
-
-const SCHEDULE_PRIMARY: Record<string, string> = {
-  ScheduleC: '31',
-  ScheduleSE: '12',
-  ScheduleD: '16',
-  ScheduleE: '26',
-  ScheduleA: '17',
-  ScheduleB: '6',
-  Schedule8812: '14',
-  Schedule1: '3',
-};
 
 export function detect(priorReturn: TaxReturn, currentReturn: TaxReturn, ruleset?: Partial<RuleSet>): RawFinding[] {
   const rs: RuleSet = { ...DEFAULT_RULESET, ...ruleset };

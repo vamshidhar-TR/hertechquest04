@@ -5,7 +5,7 @@
  * Without one: tax-aware templates per anomaly type produce genuinely useful copy offline.
  * Detection/ranking is never in this path — explanations are layered on after the deterministic scan.
  */
-import type { ExplainResponse, Finding } from '../../shared/types.js';
+import type { Citation, ExplainResponse, Finding } from '../../shared/types.js';
 import { MODELS, claudeAvailable } from './config.js';
 import { firstToolInput, getClient } from './claude.js';
 import { fmtMoney, fmtPct } from './engine/util.js';
@@ -14,6 +14,26 @@ interface ExplanationParts {
   why_short: string;
   why_full: string;
   suggested_action: string;
+}
+
+/** The IRS source a preparer can check for a given finding — traceability for every flag. */
+export function citationFor(f: Finding): Citation {
+  const byForm: Record<string, Citation> = {
+    Form8283: { label: 'Form 8283 — Noncash Charitable Contributions', url: 'https://www.irs.gov/forms-pubs/about-form-8283' },
+    Form8829: { label: 'Form 8829 — Expenses for Business Use of Your Home', url: 'https://www.irs.gov/forms-pubs/about-form-8829' },
+    ScheduleB: { label: 'Schedule B (Form 1040) — Interest & Ordinary Dividends', url: 'https://www.irs.gov/forms-pubs/about-schedule-b-form-1040' },
+    ScheduleC: { label: 'Schedule C (Form 1040) — Profit or Loss From Business', url: 'https://www.irs.gov/forms-pubs/about-schedule-c-form-1040' },
+    ScheduleD: { label: 'Schedule D (Form 1040) — Capital Gains and Losses', url: 'https://www.irs.gov/forms-pubs/about-schedule-d-form-1040' },
+    ScheduleE: { label: 'Schedule E (Form 1040) — Supplemental Income and Loss', url: 'https://www.irs.gov/forms-pubs/about-schedule-e-form-1040' },
+    ScheduleSE: { label: 'Schedule SE (Form 1040) — Self-Employment Tax', url: 'https://www.irs.gov/forms-pubs/about-schedule-se-form-1040' },
+    ScheduleA: { label: 'Schedule A (Form 1040) — Itemized Deductions', url: 'https://www.irs.gov/forms-pubs/about-schedule-a-form-1040' },
+  };
+  if (f.subtype === 'itemized_below_standard') return { label: 'IRS Pub 501 — Standard Deduction vs. Itemizing', url: 'https://www.irs.gov/forms-pubs/about-publication-501' };
+  if ((f.canonical_path ?? '').includes('charitable')) return { label: 'IRS Pub 526 — Charitable Contributions', url: 'https://www.irs.gov/forms-pubs/about-publication-526' };
+  if (byForm[f.form]) return byForm[f.form];
+  if (f.anomaly_type === 'sign_flip' || f.anomaly_type === 'pct_variance_over_threshold')
+    return { label: 'IRM 4.10.4 — year-over-year comparison in return examination', url: 'https://www.irs.gov/irm/part4/irm_04-010-004' };
+  return { label: 'IRS Form 1040 Instructions', url: 'https://www.irs.gov/forms-pubs/about-form-1040' };
 }
 
 export function templateExplain(f: Finding): ExplanationParts {
@@ -137,6 +157,12 @@ const EXPLAIN_TOOL_SCHEMA = {
           why_short: { type: 'string', description: '<= 2 sentences, plain English, grounded only in the given values' },
           why_full: { type: 'string', description: '2-4 sentences of deeper rationale' },
           suggested_action: { type: 'string', description: 'one concrete next step for the preparer' },
+          citation: {
+            type: 'object',
+            description: 'the real IRS form/Pub a preparer can check; never invent a source',
+            properties: { label: { type: 'string' }, url: { type: 'string' } },
+            required: ['label'],
+          },
         },
         required: ['finding_id', 'why_short'],
       },
@@ -150,6 +176,7 @@ interface ClaudeExplanation {
   why_short: string;
   why_full?: string;
   suggested_action?: string;
+  citation?: Citation;
 }
 
 async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): Promise<ClaudeExplanation[]> {
@@ -169,7 +196,8 @@ async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): P
   const system =
     'You are CoCounsel, assisting a US individual (Form 1040) tax preparer. For each finding, explain in plain ' +
     'English WHY it matters and what it implies, grounded ONLY in the values provided. Never invent forms, line ' +
-    'numbers, or dollar amounts not present. Keep why_short to at most 2 sentences.' +
+    'numbers, or dollar amounts not present. Keep why_short to at most 2 sentences. Include a citation to the ' +
+    'relevant REAL IRS form or publication (e.g. "Schedule B (Form 1040)", "Pub 526") — never fabricate a source.' +
     (verbosity === 'full' ? ' Also provide a 2-4 sentence why_full and a concrete suggested_action.' : '');
   const msg = await client.messages.create({
     model: MODELS.explain,
@@ -192,6 +220,61 @@ async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): P
   return out.explanations;
 }
 
+/** Answer a spoken follow-up about one finding — Claude when available, else a grounded template. */
+export async function answerFollowup(finding: Finding, question: string): Promise<{ answer: string; citation: Citation; answered_via: 'claude' | 'deterministic' }> {
+  const citation = citationFor(finding);
+  const t = templateExplain(finding);
+  const q = (question || '').toLowerCase();
+
+  if (claudeAvailable()) {
+    try {
+      const client = getClient();
+      if (client) {
+        const msg = await client.messages.create({
+          model: MODELS.explain,
+          max_tokens: 400,
+          temperature: 0.2,
+          system:
+            'You are CoCounsel assisting a US tax preparer by voice. Answer the spoken follow-up about this single ' +
+            'flagged line in <=3 sentences, grounded ONLY in the finding values. Cite a real IRS form/Pub; never invent numbers or sources.',
+          messages: [
+            {
+              role: 'user',
+              content: `Finding: ${JSON.stringify({
+                label: finding.label,
+                type: finding.anomaly_type,
+                prior: finding.prior_value,
+                current: finding.current_value,
+                pct: finding.pct,
+                reasons: finding.reasons,
+              })}\n\nQuestion: "${question}"`,
+            },
+          ],
+        });
+        const text = msg.content
+          .filter((b) => b.type === 'text')
+          .map((b) => (b as { text: string }).text)
+          .join(' ')
+          .trim();
+        if (text) return { answer: text, citation, answered_via: 'claude' };
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+
+  // Deterministic, intent-aware fallback.
+  let answer: string;
+  if (/last year|prior|previous|before|used to/.test(q)) {
+    answer = `Last year ${finding.label} was ${fmtMoney(finding.prior_value)}; this year it's ${fmtMoney(finding.current_value)}.`;
+  } else if (/rule|cite|citation|source|allowed|irs|pub|form/.test(q)) {
+    answer = `${citation.label}. ${t.why_short}`;
+  } else {
+    answer = `${t.why_full} ${t.suggested_action}`;
+  }
+  return { answer, citation, answered_via: 'deterministic' };
+}
+
 export async function explainFindings(
   _taxpayerId: string,
   findings: Finding[],
@@ -204,9 +287,15 @@ export async function explainFindings(
       return {
         explanations: findings.map((f) => {
           const hit = map.get(f.finding_id);
-          if (hit) return hit;
+          if (hit) return { ...hit, citation: hit.citation ?? citationFor(f) };
           const t = templateExplain(f);
-          return { finding_id: f.finding_id, why_short: t.why_short, why_full: t.why_full, suggested_action: t.suggested_action };
+          return {
+            finding_id: f.finding_id,
+            why_short: t.why_short,
+            why_full: t.why_full,
+            suggested_action: t.suggested_action,
+            citation: citationFor(f),
+          };
         }),
       };
     } catch {
@@ -216,7 +305,13 @@ export async function explainFindings(
   return {
     explanations: findings.map((f) => {
       const t = templateExplain(f);
-      return { finding_id: f.finding_id, why_short: t.why_short, why_full: t.why_full, suggested_action: t.suggested_action };
+      return {
+        finding_id: f.finding_id,
+        why_short: t.why_short,
+        why_full: t.why_full,
+        suggested_action: t.suggested_action,
+        citation: citationFor(f),
+      };
     }),
   };
 }

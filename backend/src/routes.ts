@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import type {
+  AskRequest,
   ExplainRequest,
   HealthResponse,
   ParseRuleRequest,
@@ -11,7 +12,7 @@ import type {
 import { availableTaxpayers, getReturnPair } from './data/index.js';
 import { analyze } from './engine/index.js';
 import { claudeAvailable, REGISTRY_VERSION } from './config.js';
-import { explainFindings } from './explain.js';
+import { answerFollowup, explainFindings } from './explain.js';
 import { parseRule } from './nlparse.js';
 import { LINE_REGISTRY, splitPath } from './registry.js';
 import { resolveRuleSet } from './schemas.js';
@@ -59,15 +60,19 @@ export function registerRoutes(app: Express): void {
 
   app.get('/api/returns/:taxpayerId', (req: Request, res: Response) => {
     const taxpayerId = String(req.params.taxpayerId);
-    const pair = getReturnPair(taxpayerId);
+    const year = req.query.year ? Number(req.query.year) : undefined;
+    const pair = getReturnPair(taxpayerId, year);
     if (!pair) {
       res.status(404).json({ error: `No taxpayer "${taxpayerId}"` });
       return;
     }
+    const meta = availableTaxpayers().find((t) => t.taxpayer_id === taxpayerId.toLowerCase());
     const body: ReturnPairResponse = {
       taxpayer_id: pair.current.taxpayer_id,
       display_name: pair.current.display_name,
       tax_years: { prior: pair.prior.tax_year, current: pair.current.tax_year },
+      years: meta?.years,
+      planted_anomalies: pair.planted_anomalies,
       prior: pair.prior,
       current: pair.current,
       line_registry: LINE_REGISTRY,
@@ -77,7 +82,7 @@ export function registerRoutes(app: Express): void {
 
   app.post('/api/scan', (req: Request, res: Response) => {
     const body = req.body as ScanRequest;
-    const pair = getReturnPair(body?.taxpayer_id ?? '');
+    const pair = getReturnPair(body?.taxpayer_id ?? '', body?.current_year);
     if (!pair) {
       res.status(404).json({ error: `No taxpayer "${body?.taxpayer_id}"` });
       return;
@@ -103,6 +108,20 @@ export function registerRoutes(app: Express): void {
       res.json(result);
     } catch (err) {
       res.status(500).json({ error: 'parse_failed', detail: String(err) });
+    }
+  });
+
+  app.post('/api/ask', async (req: Request, res: Response) => {
+    const body = req.body as AskRequest;
+    if (!body?.finding) {
+      res.status(400).json({ error: 'finding required' });
+      return;
+    }
+    try {
+      const { answer, citation, answered_via } = await answerFollowup(body.finding, String(body.question ?? ''));
+      res.json({ answer, citation, answered_via });
+    } catch (err) {
+      res.status(500).json({ error: 'ask_failed', detail: String(err) });
     }
   });
 

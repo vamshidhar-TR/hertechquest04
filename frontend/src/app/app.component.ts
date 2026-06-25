@@ -21,10 +21,17 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
           <label>Client</label>
           <select [value]="store.taxpayerId()" (change)="switchClient($any($event.target).value)">
             @for (t of store.availableTaxpayers(); track t.taxpayer_id) {
-              <option [value]="t.taxpayer_id">{{ t.display_name }}</option>
+              <option [value]="t.taxpayer_id" [selected]="t.taxpayer_id === store.taxpayerId()">{{ t.display_name }}</option>
             }
           </select>
-          @if (store.taxYears().current) {
+          @if (store.years().length > 2) {
+            <span class="vs">·</span>
+            <select [value]="store.taxYears().current" (change)="switchYear($any($event.target).value)">
+              @for (p of comparablePairs(); track p.current) {
+                <option [value]="p.current" [selected]="p.current === store.taxYears().current">TY{{ p.current }} → TY{{ p.prior }}</option>
+              }
+            </select>
+          } @else if (store.taxYears().current) {
             <span class="years mono">comparing TY{{ store.taxYears().current }} → TY{{ store.taxYears().prior }}</span>
           }
         </div>
@@ -137,6 +144,9 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
       .years {
         font-size: 11px;
         color: #9aa3b0;
+      }
+      .vs {
+        color: #6b7585;
       }
       .spacer {
         flex: 1;
@@ -263,5 +273,14 @@ export class AppComponent implements OnInit {
 
   switchClient(id: string): void {
     this.store.loadTaxpayer(id);
+  }
+
+  switchYear(v: string): void {
+    this.store.setComparisonYear(Number(v));
+  }
+
+  comparablePairs(): { current: number; prior: number }[] {
+    const ys = this.store.years();
+    return ys.slice(1).map((y, i) => ({ current: y, prior: ys[i] }));
   }
 }
