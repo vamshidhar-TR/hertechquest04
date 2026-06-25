@@ -27,7 +27,7 @@ interface Row {
     </div>
 
     <div class="grid-head">
-      <span class="g-line">Line</span>
+      <span></span>
       <span class="g-desc">Description</span>
       <span class="g-num">TY{{ store.taxYears().prior }} (filed)</span>
       <span class="g-num">TY{{ store.taxYears().current }} (working)</span>
@@ -41,7 +41,6 @@ interface Row {
               <span class="dot" [style.background]="dotColor(row.finding)" [title]="row.finding!.tier"></span>
             }
           </span>
-          <span class="c-line mono">{{ row.line }}</span>
           <span class="c-desc">{{ row.label }}</span>
           <span class="c-prior mono">{{ fmt(row.prior) }}</span>
           <span class="c-cur">
@@ -119,7 +118,7 @@ interface Row {
       }
       .grid-head {
         display: grid;
-        grid-template-columns: 20px 56px 1fr 150px 150px;
+        grid-template-columns: 22px minmax(0, 1fr) 150px 150px;
         gap: 0;
         padding: 9px 14px 9px 10px;
         font-size: 10.5px;
@@ -139,7 +138,7 @@ interface Row {
       }
       .row {
         display: grid;
-        grid-template-columns: 20px 56px 1fr 150px 150px;
+        grid-template-columns: 22px minmax(0, 1fr) 150px 150px;
         align-items: center;
         padding: 0 14px 0 10px;
         height: 38px;
@@ -162,10 +161,6 @@ interface Row {
         width: 9px;
         height: 9px;
         border-radius: 50%;
-      }
-      .c-line {
-        font-size: 12px;
-        color: var(--ink-faint);
       }
       .c-desc {
         font-size: 13px;
