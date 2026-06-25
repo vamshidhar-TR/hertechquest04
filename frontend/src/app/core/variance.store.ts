@@ -35,7 +35,8 @@ export class VarianceStore {
   echoBack = signal<string | null>(null);
   parsedVia = signal<'claude' | 'regex_fallback' | null>(null);
   jumpTarget = signal<string | null>(null);
-  newCritical = signal<Finding | null>(null);
+  /** Set whenever an edit/threshold change adds or resolves a flag — drives the toast + card pulse. */
+  changeToast = signal<{ kind: 'new' | 'resolved'; label: string; tier?: Tier; findingId?: string; at: number } | null>(null);
 
   // ---- voice ----
   handsFree = signal(true);
@@ -113,16 +114,25 @@ export class VarianceStore {
   scanNow(announce = false): void {
     const id = this.taxpayerId();
     this.scanning.set(true);
-    const prevCritical = new Set(this.findings().filter((f) => f.tier === 'CRITICAL').map((f) => f.finding_id));
+    const prevFindings = this.findings();
     this.api
       .scan({ taxpayer_id: id, current_year: this.taxYears().current || undefined, current_override: this.overrides(), ruleset: this.ruleset() })
       .subscribe((res) => {
+        const prevIds = new Set(prevFindings.map((f) => f.finding_id));
+        const nextIds = new Set(res.findings.map((f) => f.finding_id));
         this.findings.set(res.findings);
         this.summary.set(res.summary);
         this.scanning.set(false);
         if (this.firstScanDone) {
-          const fresh = res.findings.find((f) => f.tier === 'CRITICAL' && !prevCritical.has(f.finding_id));
-          if (fresh) this.newCritical.set(fresh);
+          // Surface what the edit changed: a newly-appeared flag (most severe first), else a resolved one.
+          const appeared = res.findings.filter((f) => !prevIds.has(f.finding_id)).sort((a, b) => b.severity - a.severity);
+          const resolved = prevFindings.filter((f) => !nextIds.has(f.finding_id)).sort((a, b) => b.severity - a.severity);
+          if (appeared.length) {
+            const f = appeared[0];
+            this.changeToast.set({ kind: 'new', label: f.label, tier: f.tier, findingId: f.finding_id, at: Date.now() });
+          } else if (resolved.length) {
+            this.changeToast.set({ kind: 'resolved', label: resolved[0].label, at: Date.now() });
+          }
         }
         this.firstScanDone = true;
         this.fetchExplanations(res.findings);

@@ -1,5 +1,4 @@
 import { Component, OnInit, effect, inject, signal } from '@angular/core';
-import type { Finding } from './core/models';
 import { VarianceStore } from './core/variance.store';
 import { ReturnGridComponent } from './components/return-grid.component';
 import { AlertsPanelComponent } from './components/alerts-panel.component';
@@ -60,12 +59,12 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
 
       <cc-nl-config-bar />
 
-      @if (toast()) {
-        <div class="toast" role="status" (click)="toast.set(null)">
+      @if (toast(); as t) {
+        <div class="toast" [class.resolved]="t.kind === 'resolved'" role="status" (click)="toast.set(null)">
           <span class="t-dot"></span>
           <div class="t-body">
-            <b>New critical flag</b>
-            <div class="t-sub">{{ toast()!.label }}</div>
+            <b>{{ t.kind === 'resolved' ? '✓ Resolved' : 'New flag' }}</b>
+            <div class="t-sub">{{ t.label }}</div>
           </div>
         </div>
       }
@@ -230,6 +229,13 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
         background: var(--crit);
         animation: cc-pulse 1.3s infinite;
       }
+      .toast.resolved {
+        border-left-color: var(--good);
+      }
+      .toast.resolved .t-dot {
+        background: var(--good);
+        animation: none;
+      }
       .t-body b {
         font-size: 13px;
       }
@@ -254,16 +260,16 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
 })
 export class AppComponent implements OnInit {
   store = inject(VarianceStore);
-  toast = signal<Finding | null>(null);
+  toast = signal<{ kind: 'new' | 'resolved'; label: string } | null>(null);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
-      const c = this.store.newCritical();
+      const c = this.store.changeToast();
       if (!c) return;
-      this.toast.set(c);
+      this.toast.set({ kind: c.kind, label: c.label });
       if (this.toastTimer) clearTimeout(this.toastTimer);
-      this.toastTimer = setTimeout(() => this.toast.set(null), 6000);
+      this.toastTimer = setTimeout(() => this.toast.set(null), 5000);
     });
   }
 

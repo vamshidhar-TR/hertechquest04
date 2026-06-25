@@ -39,7 +39,7 @@ import { AlertCardComponent } from './alert-card.component';
 
     <div class="list">
       @for (f of visible(); track f.finding_id) {
-        <cc-alert-card [f]="f" [isNew]="f.finding_id === store.newCritical()?.finding_id" (jump)="store.jumpTo($event)" />
+        <cc-alert-card [f]="f" [isNew]="store.changeToast()?.kind === 'new' && f.finding_id === store.changeToast()?.findingId" (jump)="store.jumpTo($event)" />
       } @empty {
         <div class="empty">No alerts at this threshold. Lower it or load a return.</div>
       }
