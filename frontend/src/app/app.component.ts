@@ -1,4 +1,4 @@
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { VarianceStore } from './core/variance.store';
 import { ReturnGridComponent } from './components/return-grid.component';
 import { AlertsPanelComponent } from './components/alerts-panel.component';
@@ -58,16 +58,6 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
       </main>
 
       <cc-nl-config-bar />
-
-      @if (toast(); as t) {
-        <div class="toast" [class.resolved]="t.kind === 'resolved'" role="status" (click)="toast.set(null)">
-          <span class="t-dot"></span>
-          <div class="t-body">
-            <b>{{ t.kind === 'resolved' ? '✓ Resolved' : 'New flag' }}</b>
-            <div class="t-sub">{{ t.label }}</div>
-          </div>
-        </div>
-      }
     </div>
   `,
   styles: [
@@ -204,47 +194,6 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
         min-height: 0;
         overflow: hidden;
       }
-      .toast {
-        position: fixed;
-        right: 22px;
-        bottom: 96px;
-        background: #fff;
-        border: 1px solid var(--border-strong);
-        border-left: 4px solid var(--crit);
-        border-radius: 10px;
-        box-shadow: var(--shadow-md);
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        max-width: 340px;
-        cursor: pointer;
-        animation: cc-fade-in 0.25s ease both;
-        z-index: 50;
-      }
-      .t-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--crit);
-        animation: cc-pulse 1.3s infinite;
-      }
-      .toast.resolved {
-        border-left-color: var(--good);
-      }
-      .toast.resolved .t-dot {
-        background: var(--good);
-        animation: none;
-      }
-      .t-body b {
-        font-size: 13px;
-      }
-      .t-sub {
-        font-size: 12px;
-        color: var(--ink-soft);
-        margin-top: 1px;
-      }
-
       @media (max-width: 1080px) {
         .workspace {
           grid-template-columns: 1fr;
@@ -260,18 +209,6 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
 })
 export class AppComponent implements OnInit {
   store = inject(VarianceStore);
-  toast = signal<{ kind: 'new' | 'resolved'; label: string } | null>(null);
-  private toastTimer: ReturnType<typeof setTimeout> | null = null;
-
-  constructor() {
-    effect(() => {
-      const c = this.store.changeToast();
-      if (!c) return;
-      this.toast.set({ kind: c.kind, label: c.label });
-      if (this.toastTimer) clearTimeout(this.toastTimer);
-      this.toastTimer = setTimeout(() => this.toast.set(null), 5000);
-    });
-  }
 
   ngOnInit(): void {
     this.store.init();
