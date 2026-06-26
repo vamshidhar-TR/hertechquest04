@@ -18,6 +18,42 @@ export class VoiceService {
     if (m) this.cancelSpeech(); // muting takes effect immediately, even mid-sentence
   }
 
+  private preferredVoice: SpeechSynthesisVoice | null = null;
+
+  constructor() {
+    if (this.ttsSupported) {
+      const load = () => (this.preferredVoice = this.pickBestVoice(window.speechSynthesis.getVoices()));
+      load(); // voices are often empty on first call…
+      try {
+        window.speechSynthesis.addEventListener('voiceschanged', load); // …so re-pick when they load
+      } catch {
+        /* older browsers */
+      }
+    }
+  }
+
+  /** Prefer the most natural-sounding English voice the OS/browser offers (neural/online/Google),
+   *  and avoid the old robotic SAPI desktop voices. Edge ships excellent free "Natural" voices. */
+  private pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+    if (!voices?.length) return null;
+    const en = voices.filter((v) => /^en[-_]?/i.test(v.lang));
+    const pool = en.length ? en : voices;
+    const score = (v: SpeechSynthesisVoice): number => {
+      const n = v.name.toLowerCase();
+      let s = 0;
+      if (/natural|neural/.test(n)) s += 100; // Edge/Windows neural voices — best
+      if (/google/.test(n)) s += 60; // Chrome's Google voices — good
+      if (/premium|enhanced/.test(n)) s += 50; // macOS premium voices
+      if (/online/.test(n)) s += 40;
+      if (/samantha|ava|jenny|aria|allison|serena|sonia|libby|emma/.test(n)) s += 30;
+      if (v.localService === false) s += 20;
+      if (/en-us/i.test(v.lang)) s += 10;
+      if (/desktop|david|zira|mark|hazel/.test(n)) s -= 60; // old robotic SAPI voices
+      return s;
+    };
+    return [...pool].sort((a, b) => score(b) - score(a))[0] ?? null;
+  }
+
   get sttSupported(): boolean {
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
   }
@@ -50,8 +86,9 @@ export class VoiceService {
   speak(text: string): void {
     if (this.muted() || !this.ttsSupported) return;
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.03;
-    u.pitch = 1;
+    if (this.preferredVoice) u.voice = this.preferredVoice;
+    u.rate = 1.0;
+    u.pitch = 1.0;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   }
