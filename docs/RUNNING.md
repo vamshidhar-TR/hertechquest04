@@ -71,14 +71,25 @@ collapse, and downstream effects. Try these:
 
 By default the AI features run on built-in deterministic fallbacks (template explanations + regex rule parsing) — the top-right pill reads *"Offline · deterministic fallback."*
 
-To enable Claude-powered explanations and natural-language parsing, set an API key **before** starting:
+To enable Claude-powered explanations and natural-language parsing, set credentials **before** starting. Two options:
+
+**A) Thomson Reuters LiteLLM gateway** (no direct Anthropic key — uses a bearer virtual key):
+
+```bash
+export ANTHROPIC_BASE_URL=https://litellm.int.thomsonreuters.com
+export ANTHROPIC_AUTH_TOKEN=<your-litellm-virtual-key>
+export ANTHROPIC_MODEL=anthropic/claude-opus-4-7   # match the name your gateway registers
+./run.sh
+```
+
+**B) Direct Anthropic:**
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-…
 ./run.sh
 ```
 
-The pill flips to *"Claude live."* Everything still works without it — the key only enriches the wording.
+The pill flips to *"Claude live."* Everything still works without either — credentials only enrich the wording. If a model name is rejected, set `ANTHROPIC_MODEL` (or `ANTHROPIC_MODEL_EXPLAIN` / `ANTHROPIC_MODEL_PARSE`) to whatever your gateway exposes.
 
 ---
 

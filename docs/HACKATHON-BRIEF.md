@@ -39,7 +39,7 @@ The kit is explicit: *"Each tool is optional… none is required to finish the h
 | Kit building block | What it's for | Our choice | Why |
 |---|---|---|---|
 | VS Code / Cursor / Codex | editor / AI pair | (your editor) | n/a — tooling, not the app |
-| **LLM brain** | explanations, Q&A | **Claude API** (`@anthropic-ai/sdk`) + deterministic fallback | kit says the brain is interchangeable; Claude needs no OAuth and runs offline-degraded for a safe live demo |
+| **LLM brain** | explanations, Q&A | **Claude** via `@anthropic-ai/sdk` — direct key **or the TR LiteLLM gateway** (`ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN`) — + deterministic fallback | kit says the brain is interchangeable; LiteLLM means no direct Anthropic key needed, and it runs offline-degraded for a safe live demo |
 | **MCP → CoCounsel** | cited tax-rule answers | **documented as an optional swap** behind our `answer()` seam (`ApiService`) | their Tax MCP endpoint + 30–60s OAuth research calls are a live-demo risk; our `/api/ask` + `/api/explain` is the same seam |
 | **Whisper / Parakeet** (STT) | speech → text, on-device | **browser Web Speech** (SpeechRecognition) | zero-install, instant demo. **Tradeoff:** browser STT is cloud-based, not on-device-private — see below |
 | **Kokoro / Piper** (TTS) | speak answers | **browser Web Speech** (SpeechSynthesis) | same — zero-install |

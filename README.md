@@ -24,10 +24,16 @@ cd backend  && npm install && npm start     # API on :3001
 cd frontend && npm install && npm start      # UI on :4200
 ```
 
-**No API key needed.** The app runs fully on deterministic fallbacks (regex NL parsing + tax-aware template explanations). To light up Claude-powered explanations and natural-language rule parsing:
+**No key needed.** The app runs fully on deterministic fallbacks (regex NL parsing + tax-aware template explanations). To light up Claude-powered explanations + NL parsing, set credentials **before** starting — either via the TR LiteLLM gateway (no direct Anthropic key) or a direct key:
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-…   # then run.sh
+# via the Thomson Reuters LiteLLM gateway
+export ANTHROPIC_BASE_URL=https://litellm.int.thomsonreuters.com
+export ANTHROPIC_AUTH_TOKEN=<your-litellm-virtual-key>
+export ANTHROPIC_MODEL=anthropic/claude-opus-4-7
+./run.sh
+
+# …or direct Anthropic:  export ANTHROPIC_API_KEY=sk-ant-…
 ```
 
 The top-bar pill flips from *“Offline · deterministic fallback”* to *“Claude live.”*

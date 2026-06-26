@@ -1,13 +1,25 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { getAnthropicKey } from './config.js';
+import { claudeAvailable, getAnthropicAuthToken, getAnthropicBaseURL, getAnthropicKey } from './config.js';
 
 let cached: Anthropic | null = null;
 
-/** Returns a configured Anthropic client, or null when no API key is set (offline mode). */
+/**
+ * Returns a configured Anthropic client, or null when no credentials are set (offline mode).
+ * Supports both direct Anthropic (ANTHROPIC_API_KEY) and an Anthropic-compatible proxy such as
+ * the TR LiteLLM gateway (ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN → bearer auth).
+ */
 export function getClient(): Anthropic | null {
-  const key = getAnthropicKey();
-  if (!key) return null;
-  if (!cached) cached = new Anthropic({ apiKey: key });
+  if (!claudeAvailable()) return null;
+  if (!cached) {
+    const key = getAnthropicKey();
+    const authToken = getAnthropicAuthToken();
+    const baseURL = getAnthropicBaseURL();
+    cached = new Anthropic({
+      ...(key ? { apiKey: key } : {}),
+      ...(authToken ? { authToken } : {}),
+      ...(baseURL ? { baseURL } : {}),
+    });
+  }
   return cached;
 }
 
