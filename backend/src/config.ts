@@ -32,3 +32,15 @@ export const MODELS = {
   /** "Why this matters" explanations: most capable. */
   explain: process.env.ANTHROPIC_MODEL_EXPLAIN?.trim() || SHARED_MODEL || 'claude-opus-4-8',
 };
+
+/**
+ * `temperature` param for Messages calls. Omitted by default — some newer models (and gateways
+ * like LiteLLM in front of them) reject it ("temperature is deprecated for this model"). Set
+ * ANTHROPIC_TEMPERATURE=0 (or any number) to send it explicitly on models that still accept it.
+ */
+export function temperatureParam(): { temperature?: number } {
+  const raw = process.env.ANTHROPIC_TEMPERATURE?.trim();
+  if (!raw) return {};
+  const n = Number(raw);
+  return Number.isFinite(n) ? { temperature: n } : {};
+}

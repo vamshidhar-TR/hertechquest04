@@ -7,7 +7,7 @@
  */
 import type { ParseRuleResponse } from '../../shared/types.js';
 import { DEFAULT_RULESET } from '../../shared/types.js';
-import { MODELS, claudeAvailable } from './config.js';
+import { MODELS, claudeAvailable, temperatureParam } from './config.js';
 import { callClaude, getClient, firstToolInput } from './claude.js';
 import { resolveTaxpayerByName } from './data/index.js';
 import { fmtMoney } from './engine/util.js';
@@ -51,7 +51,7 @@ async function claudeExtract(text: string): Promise<ClaudeRuleExtract> {
     const msg = await client.messages.create({
       model: MODELS.parse,
       max_tokens: 512,
-      temperature: 0,
+      ...temperatureParam(),
       tools: [
         {
           name: 'emit_rule_config',

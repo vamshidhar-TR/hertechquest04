@@ -6,7 +6,7 @@
  * Detection/ranking is never in this path — explanations are layered on after the deterministic scan.
  */
 import type { Citation, ExplainResponse, Finding } from '../../shared/types.js';
-import { MODELS, claudeAvailable } from './config.js';
+import { MODELS, claudeAvailable, temperatureParam } from './config.js';
 import { callClaude, firstToolInput, getClient } from './claude.js';
 import { fmtMoney, fmtPct } from './engine/util.js';
 
@@ -203,7 +203,7 @@ async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): P
     const msg = await client.messages.create({
       model: MODELS.explain,
       max_tokens: 2048,
-      temperature: 0.2,
+      ...temperatureParam(),
       system,
       tools: [
         {
@@ -236,7 +236,7 @@ export async function answerFollowup(finding: Finding, question: string): Promis
           const msg = await client.messages.create({
             model: MODELS.explain,
             max_tokens: 400,
-            temperature: 0.2,
+            ...temperatureParam(),
             system:
               'You are CoCounsel assisting a US tax preparer by voice. Answer the spoken follow-up about this single ' +
               'flagged line in <=3 sentences, grounded ONLY in the finding values. Cite a real IRS form/Pub; never invent numbers or sources.',
