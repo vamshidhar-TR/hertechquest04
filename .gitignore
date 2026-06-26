@@ -5,3 +5,7 @@ dist/
 .angular/
 .DS_Store
 coverage/
+
+# Windows NTFS alternate-data-stream junk — illegal filenames on Windows (colon), break checkout
+*:Zone.Identifier
+*:MSOAVINFO
