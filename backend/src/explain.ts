@@ -291,7 +291,9 @@ export async function explainFindings(
       return {
         explanations: findings.map((f) => {
           const hit = map.get(f.finding_id);
-          if (hit) return { ...hit, citation: hit.citation ?? citationFor(f) };
+          // Always hand the UI a clickable source: use Claude's citation only if it has a URL,
+          // otherwise fall back to our deterministic IRS link (Claude usually emits a label, no URL).
+          if (hit) return { ...hit, citation: hit.citation?.url ? hit.citation : citationFor(f) };
           const t = templateExplain(f);
           return {
             finding_id: f.finding_id,
