@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "disclaimer": "FICTIONAL / SYNTHETIC DATA — not real taxpayer data. Invented for demo and testing only.",
+    "role": "PRIOR YEAR baseline. CONTROL CASE — a normal year-over-year change with NO anomalies."
+  },
+  "client": {
+    "name": "Garcia, Sofia",
+    "client_id": "DEMO-1040-0004",
+    "filing_status": "Single",
+    "preparer": "Demo Tax Pro"
+  },
+  "demographics": {
+    "taxpayer_age": 29,
+    "dependents": 0,
+    "state": "IL",
+    "taxpayer_occupation": "Marketing analyst"
+  },
+  "tax_year": 2024,
+  "form": "1040",
+  "forms_present": ["1040", "Schedule B"],
+  "line_items": {
+    "wages_1040_1a": 72000,
+    "taxable_interest_sch_b": 420,
+    "ordinary_dividends_sch_b": 1100,
+    "qualified_dividends_1040_3a": 900,
+    "total_income": 73520,
+    "student_loan_interest_sch1": 1500,
+    "total_adjustments_sch1": 1500,
+    "adjusted_gross_income": 72020,
+    "standard_deduction": 14600,
+    "taxable_income": 57420,
+    "income_tax_1040_16": 8000,
+    "total_credits": 0,
+    "total_tax": 8000,
+    "federal_withholding": 8900,
+    "estimated_payments": 0,
+    "total_payments": 8900,
+    "refund_or_due": 900
+  }
+}

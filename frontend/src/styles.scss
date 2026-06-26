@@ -1,0 +1,138 @@
+/* ===== TaxLens · Variance Alerts — global design system ===== */
+:root {
+  /* brand */
+  --accent: #f26c21; /* Thomson Reuters orange */
+  --accent-strong: #d9550f;
+  --accent-soft: #fdf0e8;
+  --ai: #6b4ff5; /* AI assistant violet */
+  --ai-soft: #efebff;
+
+  /* surfaces */
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface-2: #fafbfc;
+  --topbar: #11161d;
+  --topbar-2: #1b232e;
+
+  /* ink */
+  --ink: #18212b;
+  --ink-soft: #5a6675;
+  --ink-faint: #8a94a3;
+  --border: #e4e8ee;
+  --border-strong: #d3d9e2;
+
+  /* severity */
+  --crit: #b3261e;
+  --crit-bg: #fdecea;
+  --high: #c2410c;
+  --high-bg: #fff1e6;
+  --med: #a66a00;
+  --med-bg: #fff8e1;
+  --low: #475467;
+  --low-bg: #f2f4f7;
+  --info: #3b6fb0;
+  --info-bg: #eef4fb;
+  --good: #1a7f5a;
+  --good-bg: #e7f5ef;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.1);
+  --mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+input {
+  font-family: inherit;
+}
+
+/* numbers in the grid + deltas read as tabular monospace */
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* tier pills, reused everywhere */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cdd4de;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b6bfcc;
+  background-clip: content-box;
+}
+
+@keyframes tl-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 108, 33, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(242, 108, 33, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 108, 33, 0);
+  }
+}
+@keyframes tl-flash {
+  0%,
+  100% {
+    background: transparent;
+  }
+  30% {
+    background: var(--accent-soft);
+  }
+}
+@keyframes tl-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

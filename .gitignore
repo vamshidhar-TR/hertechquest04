@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.env
+*.log
+.angular/
+.DS_Store
+coverage/
+
+# Lockfiles are intentionally untracked: let `npm install` resolve dependencies
+# fresh per-platform, so clones on Windows/mac/Linux don't hit cross-platform
+# optional-dependency errors (e.g. Rollup/esbuild native binaries).
+package-lock.json
+
+# Dev-only material — not part of the shipped project
+reference-docs/
+docs/
+
+# Windows NTFS alternate-data-stream junk — illegal filenames on Windows (colon), break checkout
+*:Zone.Identifier
+*:MSOAVINFO
