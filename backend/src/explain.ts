@@ -7,7 +7,7 @@
  */
 import type { Citation, ExplainResponse, Finding } from '../../shared/types.js';
 import { MODELS, aiAvailable, temperatureParam } from './config.js';
-import { callAI, firstToolInput, getClient } from './ai.js';
+import { firstToolInput, getClient } from './ai.js';
 import { fmtMoney, fmtPct } from './engine/util.js';
 
 interface ExplanationParts {
@@ -199,27 +199,25 @@ async function aiExplain(findings: Finding[], verbosity: 'card' | 'full'): Promi
     'numbers, or dollar amounts not present. Keep why_short to at most 2 sentences. Include a citation to the ' +
     'relevant REAL IRS form or publication (e.g. "Schedule B (Form 1040)", "Pub 526") — never fabricate a source.' +
     (verbosity === 'full' ? ' Also provide a 2-4 sentence why_full and a concrete suggested_action.' : '');
-  return callAI('explanations (/api/explain)', MODELS.explain, async () => {
-    const msg = await client.messages.create({
-      model: MODELS.explain,
-      max_tokens: 2048,
-      ...temperatureParam(),
-      system,
-      tools: [
-        {
-          name: 'emit_explanations',
-          description: 'Return one grounded explanation per finding.',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          input_schema: EXPLAIN_TOOL_SCHEMA as any,
-        },
-      ],
-      tool_choice: { type: 'tool', name: 'emit_explanations' },
-      messages: [{ role: 'user', content: `Findings:\n${JSON.stringify(compact, null, 2)}` }],
-    });
-    const out = firstToolInput<{ explanations: AiExplanation[] }>(msg);
-    if (!out?.explanations) throw new Error('no explanations in response');
-    return out.explanations;
+  const msg = await client.messages.create({
+    model: MODELS.explain,
+    max_tokens: 2048,
+    ...temperatureParam(),
+    system,
+    tools: [
+      {
+        name: 'emit_explanations',
+        description: 'Return one grounded explanation per finding.',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        input_schema: EXPLAIN_TOOL_SCHEMA as any,
+      },
+    ],
+    tool_choice: { type: 'tool', name: 'emit_explanations' },
+    messages: [{ role: 'user', content: `Findings:\n${JSON.stringify(compact, null, 2)}` }],
   });
+  const out = firstToolInput<{ explanations: AiExplanation[] }>(msg);
+  if (!out?.explanations) throw new Error('no explanations in response');
+  return out.explanations;
 }
 
 /** Answer a spoken follow-up about one finding — AI when available, else a grounded template. */
@@ -232,34 +230,32 @@ export async function answerFollowup(finding: Finding, question: string): Promis
     const client = getClient();
     try {
       if (client) {
-        const text = await callAI('voice follow-up (/api/ask)', MODELS.explain, async () => {
-          const msg = await client.messages.create({
-            model: MODELS.explain,
-            max_tokens: 400,
-            ...temperatureParam(),
-            system:
-              'You are an AI assistant helping a US tax preparer by voice. Answer the spoken follow-up about this single ' +
-              'flagged line in <=3 sentences, grounded ONLY in the finding values. Cite a real IRS form/Pub; never invent numbers or sources.',
-            messages: [
-              {
-                role: 'user',
-                content: `Finding: ${JSON.stringify({
-                  label: finding.label,
-                  type: finding.anomaly_type,
-                  prior: finding.prior_value,
-                  current: finding.current_value,
-                  pct: finding.pct,
-                  reasons: finding.reasons,
-                })}\n\nQuestion: "${question}"`,
-              },
-            ],
-          });
-          return msg.content
-            .filter((b) => b.type === 'text')
-            .map((b) => (b as { text: string }).text)
-            .join(' ')
-            .trim();
+        const msg = await client.messages.create({
+          model: MODELS.explain,
+          max_tokens: 400,
+          ...temperatureParam(),
+          system:
+            'You are an AI assistant helping a US tax preparer by voice. Answer the spoken follow-up about this single ' +
+            'flagged line in <=3 sentences, grounded ONLY in the finding values. Cite a real IRS form/Pub; never invent numbers or sources.',
+          messages: [
+            {
+              role: 'user',
+              content: `Finding: ${JSON.stringify({
+                label: finding.label,
+                type: finding.anomaly_type,
+                prior: finding.prior_value,
+                current: finding.current_value,
+                pct: finding.pct,
+                reasons: finding.reasons,
+              })}\n\nQuestion: "${question}"`,
+            },
+          ],
         });
+        const text = msg.content
+          .filter((b) => b.type === 'text')
+          .map((b) => (b as { text: string }).text)
+          .join(' ')
+          .trim();
         if (text) return { answer: text, citation, answered_via: 'ai' };
       }
     } catch {

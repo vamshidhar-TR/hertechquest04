@@ -8,7 +8,7 @@
 import type { ParseRuleResponse } from '../../shared/types.js';
 import { DEFAULT_RULESET } from '../../shared/types.js';
 import { MODELS, aiAvailable, temperatureParam } from './config.js';
-import { callAI, getClient, firstToolInput } from './ai.js';
+import { getClient, firstToolInput } from './ai.js';
 import { resolveTaxpayerByName } from './data/index.js';
 import { fmtMoney } from './engine/util.js';
 import { RuleExtract, RULESET_TOOL_SCHEMA, resolveRuleSet } from './schemas.js';
@@ -47,33 +47,31 @@ function regexExtract(text: string): RuleExtract {
 async function aiExtract(text: string): Promise<RuleExtract> {
   const client = getClient();
   if (!client) throw new Error('no client');
-  return callAI('NL rule parse (/api/parse-rule)', MODELS.parse, async () => {
-    const msg = await client.messages.create({
-      model: MODELS.parse,
-      max_tokens: 512,
-      ...temperatureParam(),
-      tools: [
-        {
-          name: 'emit_rule_config',
-          description:
-            'Map a tax preparer\'s natural-language alerting instruction into a structured rule config. ' +
-            'Only map language to the given fields. Do NOT invent thresholds (leave null if unstated). Do NOT compute.',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          input_schema: RULESET_TOOL_SCHEMA as any,
-        },
-      ],
-      tool_choice: { type: 'tool', name: 'emit_rule_config' },
-      messages: [
-        {
-          role: 'user',
-          content: `Preparer instruction: "${text}"\n\nEmit the rule config that captures it.`,
-        },
-      ],
-    });
-    const extract = firstToolInput<RuleExtract>(msg);
-    if (!extract) throw new Error('no tool output in response');
-    return extract;
+  const msg = await client.messages.create({
+    model: MODELS.parse,
+    max_tokens: 512,
+    ...temperatureParam(),
+    tools: [
+      {
+        name: 'emit_rule_config',
+        description:
+          'Map a tax preparer\'s natural-language alerting instruction into a structured rule config. ' +
+          'Only map language to the given fields. Do NOT invent thresholds (leave null if unstated). Do NOT compute.',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        input_schema: RULESET_TOOL_SCHEMA as any,
+      },
+    ],
+    tool_choice: { type: 'tool', name: 'emit_rule_config' },
+    messages: [
+      {
+        role: 'user',
+        content: `Preparer instruction: "${text}"\n\nEmit the rule config that captures it.`,
+      },
+    ],
   });
+  const extract = firstToolInput<RuleExtract>(msg);
+  if (!extract) throw new Error('no tool output in response');
+  return extract;
 }
 
 function titleCase(id: string): string {
