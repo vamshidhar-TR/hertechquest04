@@ -1,9 +1,9 @@
 {
-  "name": "verivance-variance-backend",
+  "name": "taxlens-variance-backend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "VeriVance Return-to-Return Variance Alerts — detection engine + API",
+  "description": "TaxLens Return-to-Return Variance Alerts — detection engine + API",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",

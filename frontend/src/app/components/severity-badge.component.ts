@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { TIER_META, type Tier } from '../core/models';
 
 @Component({
-  selector: 'vv-severity-badge',
+  selector: 'tl-severity-badge',
   standalone: true,
   template: `
     <span class="pill" [style.color]="meta().color" [style.background]="meta().bg">

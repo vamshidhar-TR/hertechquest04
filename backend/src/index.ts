@@ -12,13 +12,13 @@ registerRoutes(app);
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 app.listen(PORT, () => {
-  console.log(`[verivance] Variance Alerts API → http://localhost:${PORT}`);
+  console.log(`[taxlens] Variance Alerts API → http://localhost:${PORT}`);
   if (aiAvailable()) {
-    console.log(`[verivance] Vera ENABLED · ${describeTransport()} · explain=${MODELS.explain} · parse=${MODELS.parse}`);
-    console.log('[verivance] NOTE: "ENABLED" only means credentials are present — a bad token/model still');
-    console.log('[verivance]       shows "Vera live", but you will see "[vera] ✗ FAILED" on the first call.');
+    console.log(`[taxlens] AI ENABLED · ${describeTransport()} · explain=${MODELS.explain} · parse=${MODELS.parse}`);
+    console.log('[taxlens] NOTE: "ENABLED" only means credentials are present — a bad token/model still');
+    console.log('[taxlens]       shows "AI live", but you will see "[ai] ✗ FAILED" on the first call.');
   } else {
-    console.log('[verivance] Vera DISABLED — deterministic fallbacks active');
+    console.log('[taxlens] AI DISABLED — deterministic fallbacks active');
   }
 });
 

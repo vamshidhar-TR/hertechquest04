@@ -22,7 +22,7 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 @Component({
-  selector: 'vv-alert-card',
+  selector: 'tl-alert-card',
   standalone: true,
   imports: [SeverityBadgeComponent, DeltaChipComponent],
   template: `
@@ -30,17 +30,17 @@ const TYPE_LABEL: Record<string, string> = {
       <div class="stripe"></div>
       <div class="body">
         <div class="head">
-          <vv-severity-badge [tier]="f().tier" [severity]="f().severity" />
+          <tl-severity-badge [tier]="f().tier" [severity]="f().severity" />
           <span class="type">{{ typeLabel() }}</span>
           <span class="spacer"></span>
           <button class="anchor mono" (click)="jump.emit(f().canonical_path)" title="Jump to line">{{ anchor() }}</button>
         </div>
 
         <h3 class="title">{{ title() }}</h3>
-        <vv-delta-chip [finding]="f()" />
+        <tl-delta-chip [finding]="f()" />
 
         <div class="why">
-          <span class="vv-mark">Vera</span>
+          <span class="tl-mark">AI</span>
           @if (f().explanation?.why_short) {
             <span class="why-text">{{ f().explanation?.why_short }}</span>
           } @else {
@@ -104,10 +104,10 @@ const TYPE_LABEL: Record<string, string> = {
         border-radius: var(--radius);
         box-shadow: var(--shadow-sm);
         overflow: hidden;
-        animation: vv-fade-in 0.25s ease both;
+        animation: tl-fade-in 0.25s ease both;
       }
       .card.is-new {
-        animation: vv-fade-in 0.25s ease both, vv-pulse 1.4s ease 1;
+        animation: tl-fade-in 0.25s ease both, tl-pulse 1.4s ease 1;
       }
       .stripe {
         width: 4px;
@@ -160,12 +160,12 @@ const TYPE_LABEL: Record<string, string> = {
         color: var(--ink-soft);
         line-height: 1.5;
       }
-      .vv-mark {
+      .tl-mark {
         display: inline-block;
         font-size: 10px;
         font-weight: 700;
-        color: var(--vera);
-        background: var(--vera-soft);
+        color: var(--ai);
+        background: var(--ai-soft);
         border-radius: 5px;
         padding: 1px 6px;
         margin-right: 6px;
@@ -200,7 +200,7 @@ const TYPE_LABEL: Record<string, string> = {
         border-top: 1px dashed var(--border);
         font-size: 13px;
         color: var(--ink-soft);
-        animation: vv-fade-in 0.2s ease both;
+        animation: tl-fade-in 0.2s ease both;
       }
       .drawer p {
         margin: 0 0 8px;
@@ -253,17 +253,17 @@ const TYPE_LABEL: Record<string, string> = {
       .ask-answer {
         margin-top: 10px;
         padding: 9px 11px;
-        background: var(--vera-soft);
+        background: var(--ai-soft);
         border-radius: 8px;
         display: flex;
         flex-direction: column;
         gap: 4px;
-        animation: vv-fade-in 0.2s ease both;
+        animation: tl-fade-in 0.2s ease both;
       }
       .ask-answer .q {
         font-size: 11.5px;
         font-weight: 600;
-        color: var(--vera);
+        color: var(--ai);
       }
       .ask-answer .a {
         font-size: 13px;

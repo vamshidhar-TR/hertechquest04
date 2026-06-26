@@ -121,7 +121,7 @@ export interface ReturnPairResponse {
 export interface AskResponse {
   answer: string;
   citation?: Citation;
-  answered_via: 'vera' | 'deterministic';
+  answered_via: 'ai' | 'deterministic';
 }
 export interface ParseRuleResponse {
   ruleset: RuleSet;
@@ -129,7 +129,7 @@ export interface ParseRuleResponse {
   echo_back: string;
   needs_clarification: boolean;
   clarification_question: string | null;
-  parsed_via: 'vera' | 'regex_fallback';
+  parsed_via: 'ai' | 'regex_fallback';
 }
 export interface ExplainResponse {
   explanations: Explanation[];

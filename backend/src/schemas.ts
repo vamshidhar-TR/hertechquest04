@@ -1,4 +1,4 @@
-/** RuleSet validation/normalization + the JSON Schema Vera uses to emit a rule config. */
+/** RuleSet validation/normalization + the JSON Schema AI uses to emit a rule config. */
 import type { AnomalyType, RuleSet } from '../../shared/types.js';
 import { DEFAULT_RULESET } from '../../shared/types.js';
 
@@ -45,7 +45,7 @@ export function resolveRuleSet(partial?: Partial<RuleSet> | null): RuleSet {
 }
 
 /**
- * Input schema for the Vera `emit_rule_config` tool. Vera ONLY maps language → these enums;
+ * Input schema for the AI `emit_rule_config` tool. AI ONLY maps language → these enums;
  * it must not compute or invent thresholds (leave null). Deterministic code does the rest.
  */
 export const RULESET_TOOL_SCHEMA = {
@@ -77,7 +77,7 @@ export const RULESET_TOOL_SCHEMA = {
   required: ['pct_threshold', 'focus', 'target_name'],
 };
 
-/** Shape Vera returns for emit_rule_config (before deterministic resolution). */
+/** Shape AI returns for emit_rule_config (before deterministic resolution). */
 export interface RuleExtract {
   pct_threshold: number | null;
   min_abs_dollars: number | null;

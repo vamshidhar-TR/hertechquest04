@@ -6,6 +6,10 @@ dist/
 .DS_Store
 coverage/
 
+# Dev-only material — not part of the shipped project
+reference-docs/
+docs/
+
 # Windows NTFS alternate-data-stream junk — illegal filenames on Windows (colon), break checkout
 *:Zone.Identifier
 *:MSOAVINFO

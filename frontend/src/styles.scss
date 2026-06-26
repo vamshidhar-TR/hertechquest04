@@ -1,11 +1,11 @@
-/* ===== VeriVance · Variance Alerts — global design system ===== */
+/* ===== TaxLens · Variance Alerts — global design system ===== */
 :root {
   /* brand */
   --accent: #f26c21; /* Thomson Reuters orange */
   --accent-strong: #d9550f;
   --accent-soft: #fdf0e8;
-  --vera: #6b4ff5; /* Vera assistant violet */
-  --vera-soft: #efebff;
+  --ai: #6b4ff5; /* AI assistant violet */
+  --ai-soft: #efebff;
 
   /* surfaces */
   --bg: #f4f6f9;
@@ -101,7 +101,7 @@ input {
   background-clip: content-box;
 }
 
-@keyframes vv-pulse {
+@keyframes tl-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(242, 108, 33, 0.45);
   }
@@ -112,7 +112,7 @@ input {
     box-shadow: 0 0 0 0 rgba(242, 108, 33, 0);
   }
 }
-@keyframes vv-flash {
+@keyframes tl-flash {
   0%,
   100% {
     background: transparent;
@@ -121,7 +121,7 @@ input {
     background: var(--accent-soft);
   }
 }
-@keyframes vv-fade-in {
+@keyframes tl-fade-in {
   from {
     opacity: 0;
     transform: translateY(6px);
@@ -131,7 +131,7 @@ input {
     transform: none;
   }
 }
-@keyframes vv-spin {
+@keyframes tl-spin {
   to {
     transform: rotate(360deg);
   }

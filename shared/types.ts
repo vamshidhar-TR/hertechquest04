@@ -1,5 +1,5 @@
 /**
- * Canonical domain + API contract types for VeriVance Return-to-Return Variance Alerts.
+ * Canonical domain + API contract types for TaxLens Return-to-Return Variance Alerts.
  * Single source of truth shared by the Node/Express backend and (mirrored into) the Angular frontend.
  */
 
@@ -214,7 +214,7 @@ export interface ParseRuleResponse {
   echo_back: string;
   needs_clarification: boolean;
   clarification_question: string | null;
-  parsed_via: 'vera' | 'regex_fallback';
+  parsed_via: 'ai' | 'regex_fallback';
 }
 
 export interface ExplainRequest {
@@ -251,5 +251,5 @@ export interface AskRequest {
 export interface AskResponse {
   answer: string;
   citation?: Citation;
-  answered_via: 'vera' | 'deterministic';
+  answered_via: 'ai' | 'deterministic';
 }

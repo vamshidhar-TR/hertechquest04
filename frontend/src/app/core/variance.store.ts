@@ -33,7 +33,7 @@ export class VarianceStore {
   ruleset = signal<Partial<RuleSet>>({ pct_threshold: 0.2 });
   overrides = signal<Record<string, number | null>>({});
   echoBack = signal<string | null>(null);
-  parsedVia = signal<'vera' | 'regex_fallback' | null>(null);
+  parsedVia = signal<'ai' | 'regex_fallback' | null>(null);
   jumpTarget = signal<string | null>(null);
   /** Set whenever an edit/threshold change adds or resolves a flag — drives the toast + card pulse. */
   changeToast = signal<{ kind: 'new' | 'resolved'; label: string; tier?: Tier; findingId?: string; at: number } | null>(null);

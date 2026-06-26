@@ -29,27 +29,27 @@ export function firstToolInput<T>(msg: Anthropic.Message): T | null {
   return block ? (block.input as T) : null;
 }
 
-/** Human-readable description of where Vera calls go (proxy vs direct). */
+/** Human-readable description of where AI calls go (proxy vs direct). */
 export function describeTransport(): string {
   const base = getAnthropicBaseURL();
   return base ? `LiteLLM/proxy → ${base}` : 'Anthropic API (direct)';
 }
 
 /**
- * Wrap a Vera call with request/response/failure logging so it's obvious whether a call
+ * Wrap a AI call with request/response/failure logging so it's obvious whether a call
  * actually reached the model or fell back. Re-throws on failure (the caller does the fallback).
  */
-export async function callVera<T>(purpose: string, model: string, fn: () => Promise<T>): Promise<T> {
+export async function callAI<T>(purpose: string, model: string, fn: () => Promise<T>): Promise<T> {
   const started = Date.now();
-  console.log(`[vera] → SENDING  ${purpose} · model=${model} · ${describeTransport()}`);
+  console.log(`[ai] → SENDING  ${purpose} · model=${model} · ${describeTransport()}`);
   try {
     const result = await fn();
-    console.log(`[vera] ✓ SUCCESS  ${purpose} · ${Date.now() - started}ms`);
+    console.log(`[ai] ✓ SUCCESS  ${purpose} · ${Date.now() - started}ms`);
     return result;
   } catch (err) {
     const e = err as { status?: number; message?: string };
     const status = e?.status ? `HTTP ${e.status} · ` : '';
-    console.warn(`[vera] ✗ FAILED   ${purpose} · ${Date.now() - started}ms · ${status}${e?.message ?? String(err)} → using deterministic fallback`);
+    console.warn(`[ai] ✗ FAILED   ${purpose} · ${Date.now() - started}ms · ${status}${e?.message ?? String(err)} → using deterministic fallback`);
     throw err;
   }
 }

@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { fmtMoney, fmtPct, type Finding } from '../core/models';
 
 @Component({
-  selector: 'vv-delta-chip',
+  selector: 'tl-delta-chip',
   standalone: true,
   template: `
     <span class="delta mono" [class.down]="dir() === 'down'" [class.up]="dir() === 'up'">

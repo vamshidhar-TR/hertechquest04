@@ -13,7 +13,7 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
       <header class="topbar">
         <div class="brand">
           <span class="tr">TR</span>
-          <span class="product">VeriVance<span class="sub">Return-to-Return Variance Alerts</span></span>
+          <span class="product">TaxLens<span class="sub">Return-to-Return Variance Alerts</span></span>
         </div>
 
         <div class="client">
@@ -39,7 +39,7 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
 
         <div class="status">
           <span class="ai-pill" [class.on]="store.aiAvailable()">
-            <span class="led"></span>{{ store.aiAvailable() ? 'Vera live' : 'Offline · deterministic fallback' }}
+            <span class="led"></span>{{ store.aiAvailable() ? 'AI live' : 'Offline · deterministic fallback' }}
           </span>
         </div>
       </header>
@@ -50,14 +50,14 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
             <span class="pane-title">{{ store.displayName() || 'Loading…' }}</span>
             <span class="pane-sub">Working return — edit any current-year value to re-scan live</span>
           </div>
-          <vv-return-grid />
+          <tl-return-grid />
         </section>
         <aside class="right">
-          <vv-alerts-panel />
+          <tl-alerts-panel />
         </aside>
       </main>
 
-      <vv-nl-config-bar />
+      <tl-nl-config-bar />
     </div>
   `,
   styles: [
