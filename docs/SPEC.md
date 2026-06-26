@@ -1,4 +1,4 @@
-# CoCounsel — Automated Return-to-Return Variance Alerts
+# VeriVance — Automated Return-to-Return Variance Alerts
 
 > **⚠️ Alignment note.** This is the *original* engine/UX design. After the hackathon's official kit
 > arrived, the app was aligned to the **official sample-data schema** (flat `line_items` + `forms_present`,
@@ -8,11 +8,11 @@
 > For the current intent, data, tools, and gap analysis, read **[HACKATHON-BRIEF.md](HACKATHON-BRIEF.md)**.
 > §1 (data model) and §7 (demo) below describe the original synthetic data and are superseded by the brief.
 
-**Hackathon Use Case 5.** CoCounsel monitors a current-year (work-in-progress) individual Form 1040 return against the taxpayer's prior-year return and proactively surfaces anomalies *before* the return goes to review — variances over a configurable threshold (default 20%), missing schedules, dropped deductions, sign flips, and vanished income — each explained in plain English and ranked by materiality so the preparer isn't drowned in noise.
+**Hackathon Use Case 5.** VeriVance monitors a current-year (work-in-progress) individual Form 1040 return against the taxpayer's prior-year return and proactively surfaces anomalies *before* the return goes to review — variances over a configurable threshold (default 20%), missing schedules, dropped deductions, sign flips, and vanished income — each explained in plain English and ranked by materiality so the preparer isn't drowned in noise.
 
 > Voice/NL config: *"Flag anything on the Johnson return more than 20% different from last year, and tell me what's missing."*
 
-**Stack:** Angular (standalone, signals) frontend · Node + Express + TypeScript backend · Claude API (`@anthropic-ai/sdk`) for explanations + NL→rule parsing, with deterministic fallbacks so the demo runs offline. Data is synthetic (no real taxpayer PII).
+**Stack:** Angular (standalone, signals) frontend · Node + Express + TypeScript backend · Vera API (`@anthropic-ai/sdk`) for explanations + NL→rule parsing, with deterministic fallbacks so the demo runs offline. Data is synthetic (no real taxpayer PII).
 
 ---
 
@@ -70,9 +70,9 @@ Risk weights: `sign_flip 1.0`, `vanished_income 0.95`, `dropped_carryover 0.92`,
 
 ## 4. API (Express)
 
-| Method · Path | Purpose | Claude? |
+| Method · Path | Purpose | Vera? |
 |---|---|---|
-| `GET /api/health` | Liveness + `claude_available` + available taxpayers | — |
+| `GET /api/health` | Liveness + `ai_available` + available taxpayers | — |
 | `GET /api/returns/:taxpayer_id` | Normalized prior+current pair + registry for the grid | — |
 | `POST /api/returns/load` | Load a pair (seed id or uploaded JSON) | — |
 | `POST /api/scan` | Deterministic two-return walk + ranking. Called on analyze, on each debounced grid edit, on threshold change | — |
@@ -81,11 +81,11 @@ Risk weights: `sign_flip 1.0`, `vanished_income 0.95`, `dropped_carryover 0.92`,
 
 `/api/scan` request carries `current_override` (edited grid lines) + optional `ruleset`; response is `{ summary{by_tier,suppressed}, findings[] }` with `explanation:null` (filled by `/api/explain` a beat later).
 
-## 5. Claude integration
+## 5. Vera integration
 
-- **`/api/parse-rule`** — `claude-sonnet-4-6`, one Messages call, single forced tool `emit_rule_config` (input_schema = RuleSet), `temperature: 0`. Claude does **only** language→enum mapping (`"more than 20% different"` → `pct_threshold: 0.20`; `"what's missing"` → focus missing/dropped; `"Johnson return"` → taxpayer match). It must not invent thresholds or compute. Deterministic code validates, clamps, fills defaults, resolves the taxpayer, and builds the `echo_back`.
-- **`/api/explain`** — `claude-opus-4-8`, batched call **after** deterministic detection+ranking (Claude is never in the detection path). Forced-tool JSON for `why_short` (≤2 lines), optional SSE for `why_full` + `suggested_action`. Grounded in real tax meaning (missing W-2/1099, dropped carryover "allowed or allowable", Schedule C without SE understating SE tax); forbidden from inventing forms, line numbers, or dollar figures not in the finding.
-- **Resilience** — deterministic regex/keyword parser + templated tax-aware explanations when `ANTHROPIC_API_KEY` is absent; `health.claude_available` drives UI degradation (hides voice).
+- **`/api/parse-rule`** — `claude-sonnet-4-6`, one Messages call, single forced tool `emit_rule_config` (input_schema = RuleSet), `temperature: 0`. Vera does **only** language→enum mapping (`"more than 20% different"` → `pct_threshold: 0.20`; `"what's missing"` → focus missing/dropped; `"Johnson return"` → taxpayer match). It must not invent thresholds or compute. Deterministic code validates, clamps, fills defaults, resolves the taxpayer, and builds the `echo_back`.
+- **`/api/explain`** — `claude-opus-4-8`, batched call **after** deterministic detection+ranking (Vera is never in the detection path). Forced-tool JSON for `why_short` (≤2 lines), optional SSE for `why_full` + `suggested_action`. Grounded in real tax meaning (missing W-2/1099, dropped carryover "allowed or allowable", Schedule C without SE understating SE tax); forbidden from inventing forms, line numbers, or dollar figures not in the finding.
+- **Resilience** — deterministic regex/keyword parser + templated tax-aware explanations when `ANTHROPIC_API_KEY` is absent; `health.ai_available` drives UI degradation (hides voice).
 
 ## 6. Angular components
 
@@ -131,6 +131,6 @@ De-prioritized: **Wages +11%** ($142k→$158k) shown **Informational** below the
 
 **Do-not-cut spine:** the deterministic two-return walk + materiality scoring (the real IP), the corrected Johnson seed data (must reconcile or a CPA judge catches it), the static line registry.
 
-Cut order if time runs short: (1) Voice → (2) SSE streaming of full explanation → (3) Claude NL parsing (ship regex fallback) → (4) reduce to the 5 demo-carrying detectors → (5) live optimistic recompute (replace with a "Re-scan" button) → (6) virtual scroll & animations.
+Cut order if time runs short: (1) Voice → (2) SSE streaming of full explanation → (3) Vera NL parsing (ship regex fallback) → (4) reduce to the 5 demo-carrying detectors → (5) live optimistic recompute (replace with a "Re-scan" button) → (6) virtual scroll & animations.
 
 **Risks mitigated:** tax-math credibility (all Line 16 recomputed to real 2023/2024 MFJ brackets; sign flip preserved via realistic under-withholding); API latency in a live demo (offline fallbacks + pre-warmed Johnson explanations).

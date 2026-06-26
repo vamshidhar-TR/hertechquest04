@@ -121,7 +121,7 @@ export interface ReturnPairResponse {
 export interface AskResponse {
   answer: string;
   citation?: Citation;
-  answered_via: 'claude' | 'deterministic';
+  answered_via: 'vera' | 'deterministic';
 }
 export interface ParseRuleResponse {
   ruleset: RuleSet;
@@ -129,14 +129,14 @@ export interface ParseRuleResponse {
   echo_back: string;
   needs_clarification: boolean;
   clarification_question: string | null;
-  parsed_via: 'claude' | 'regex_fallback';
+  parsed_via: 'vera' | 'regex_fallback';
 }
 export interface ExplainResponse {
   explanations: Explanation[];
 }
 export interface HealthResponse {
   status: 'ok';
-  claude_available: boolean;
+  ai_available: boolean;
   registry_version: string;
   available_taxpayers: string[];
 }

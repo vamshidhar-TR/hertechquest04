@@ -11,7 +11,7 @@ import type {
 } from '../../shared/types.js';
 import { availableTaxpayers, getReturnPair } from './data/index.js';
 import { analyze } from './engine/index.js';
-import { claudeAvailable, REGISTRY_VERSION } from './config.js';
+import { aiAvailable, REGISTRY_VERSION } from './config.js';
 import { answerFollowup, explainFindings } from './explain.js';
 import { parseRule } from './nlparse.js';
 import { LINE_REGISTRY, splitPath } from './registry.js';
@@ -47,7 +47,7 @@ export function registerRoutes(app: Express): void {
   app.get('/api/health', (_req: Request, res: Response) => {
     const body: HealthResponse = {
       status: 'ok',
-      claude_available: claudeAvailable(),
+      ai_available: aiAvailable(),
       registry_version: REGISTRY_VERSION,
       available_taxpayers: availableTaxpayers().map((t) => t.taxpayer_id),
     };

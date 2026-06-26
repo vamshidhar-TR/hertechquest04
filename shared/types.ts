@@ -1,5 +1,5 @@
 /**
- * Canonical domain + API contract types for CoCounsel Return-to-Return Variance Alerts.
+ * Canonical domain + API contract types for VeriVance Return-to-Return Variance Alerts.
  * Single source of truth shared by the Node/Express backend and (mirrored into) the Angular frontend.
  */
 
@@ -214,7 +214,7 @@ export interface ParseRuleResponse {
   echo_back: string;
   needs_clarification: boolean;
   clarification_question: string | null;
-  parsed_via: 'claude' | 'regex_fallback';
+  parsed_via: 'vera' | 'regex_fallback';
 }
 
 export interface ExplainRequest {
@@ -236,7 +236,7 @@ export interface ExplainResponse {
 
 export interface HealthResponse {
   status: 'ok';
-  claude_available: boolean;
+  ai_available: boolean;
   registry_version: string;
   available_taxpayers: string[];
 }
@@ -251,5 +251,5 @@ export interface AskRequest {
 export interface AskResponse {
   answer: string;
   citation?: Citation;
-  answered_via: 'claude' | 'deterministic';
+  answered_via: 'vera' | 'deterministic';
 }

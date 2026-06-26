@@ -23,7 +23,7 @@ function lineRef(key: string): string {
 }
 
 @Component({
-  selector: 'cc-return-grid',
+  selector: 'vv-return-grid',
   standalone: true,
   template: `
     <div class="tabs">
@@ -163,7 +163,7 @@ function lineRef(key: string): string {
         background: var(--surface-2);
       }
       .row.flash {
-        animation: cc-flash 1.3s ease;
+        animation: vv-flash 1.3s ease;
       }
       .gutter {
         display: flex;

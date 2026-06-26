@@ -133,7 +133,7 @@ that flags regressions before merge** — with severity levels and a plain-Engli
    refund→owe flip, etc.
 4. **Scores & ranks** each finding by **materiality** (= alert priority) so the scary stuff floats up
    and trivial noise is suppressed.
-5. **Explains each one in plain English** → the right **alerts panel**. ("CoCounsel" is Thomson
+5. **Explains each one in plain English** → the right **alerts panel**. ("VeriVance" is Thomson
    Reuters' AI-assistant brand.)
 6. **Configurable in natural language / voice** ("flag anything >20% different"), parsed into a rule.
 

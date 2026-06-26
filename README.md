@@ -1,4 +1,4 @@
-# CoCounsel · Automated Return-to-Return Variance Alerts
+# VeriVance · Automated Return-to-Return Variance Alerts
 
 > **Hackathon Use Case 5.** Preparers miss anomalies when comparing the current-year return to last year, so errors get caught late in review. As the preparer works, the app compares this year vs last **(just math — not the LLM)** and **speaks up** when a number is materially off or a form is missing — ranked by materiality, each with a plain-English "why" and a **clickable IRS citation**. The kit's stated differentiator is **hands-free voice**: alerts are spoken aloud, and you can **ask a voice follow-up** ("why? what was it last year? is there a rule?") and hear a cited answer back. Runs on the hackathon's **official sample data** (5 clients, including a zero-alert control).
 
@@ -24,7 +24,7 @@ cd backend  && npm install && npm start     # API on :3001
 cd frontend && npm install && npm start      # UI on :4200
 ```
 
-**No key needed.** The app runs fully on deterministic fallbacks (regex NL parsing + tax-aware template explanations). To light up Claude-powered explanations + NL parsing, set credentials **before** starting — either via the TR LiteLLM gateway (no direct Anthropic key) or a direct key:
+**No key needed.** The app runs fully on deterministic fallbacks (regex NL parsing + tax-aware template explanations). To light up Vera-powered explanations + NL parsing, set credentials **before** starting — either via the TR LiteLLM gateway (no direct Anthropic key) or a direct key:
 
 ```bash
 # via the Thomson Reuters LiteLLM gateway
@@ -36,7 +36,7 @@ export ANTHROPIC_MODEL=anthropic/claude-opus-4-7
 # …or direct Anthropic:  export ANTHROPIC_API_KEY=sk-ant-…
 ```
 
-The top-bar pill flips from *“Offline · deterministic fallback”* to *“Claude live.”*
+The top-bar pill flips from *“Offline · deterministic fallback”* to *“Vera live.”*
 
 ---
 
@@ -75,10 +75,10 @@ The app loads the kit's five fictional clients (`backend/src/data/returns/`). Ea
 ┌────────────── Angular (signals) ──────────────┐      ┌─────────── Node + Express + TS ───────────┐
 │ ReturnGrid (editable, prior vs current)        │ HTTP │ /scan       deterministic two-return walk  │
 │ AlertsPanel · AlertCard · DeltaChip · Badge    │◄────►│ /returns    normalized pair + line registry│
-│ NlConfigBar (NL + voice) · Threshold slider    │      │ /parse-rule Claude Sonnet  (+ regex)       │
-│ VarianceStore (single source of truth)         │      │ /explain    Claude Opus    (+ templates)   │
+│ NlConfigBar (NL + voice) · Threshold slider    │      │ /parse-rule Vera  (+ regex)       │
+│ VarianceStore (single source of truth)         │      │ /explain    Vera    (+ templates)   │
 │ Voice: hands-free TTS + per-card "Ask" (STT)   │      │ /ask        voice follow-up (+ template)   │
-└────────────────────────────────────────────────┘      │ /health     reports claude_available       │
+└────────────────────────────────────────────────┘      │ /health     reports ai_available       │
                                                          └────────────────────────────────────────────┘
 ```
 
@@ -89,7 +89,7 @@ The official schema (flat `line_items` + `forms_present`) is mapped into our mod
 - **Noise control** — materiality ranking + a suppression cutoff + per-line dedupe keep the panel tight, so the **Garcia control yields 0 alerts** while every other client's planted anomalies surface.
 - **Traceability** — every explanation carries a clickable **IRS form/Pub citation**, and every flag jumps to its source line. *An unexplained flag is worse than no flag.*
 
-Claude is layered on top for **plain-English "why it matters"**, **NL rule parsing**, and **voice follow-up answers** — and degrades to deterministic, tax-aware fallbacks when no key is present.
+Vera is layered on top for **plain-English "why it matters"**, **NL rule parsing**, and **voice follow-up answers** — and degrades to deterministic, tax-aware fallbacks when no key is present.
 
 **Docs:**
 - [`docs/HACKATHON-BRIEF.md`](docs/HACKATHON-BRIEF.md) — **what the hackathon wants**, the tools, and our gap analysis (read this first)
@@ -114,7 +114,7 @@ solution/
 │   │   ├── returns/*.json    # the kit's 5 official clients (11 files)
 │   │   └── adapter.ts        # official flat schema → internal TaxReturn
 │   ├── engine/              # detect.ts (walk) + rank.ts (score/consolidate)
-│   ├── nlparse.ts           # NL → RuleSet (Claude + regex fallback)
+│   ├── nlparse.ts           # NL → RuleSet (Vera + regex fallback)
 │   └── explain.ts           # "why it matters" + citations + /ask follow-up
 └── frontend/src/app/        # AppShell + components + VarianceStore + ApiService
 ```

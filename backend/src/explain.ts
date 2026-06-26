@@ -1,13 +1,13 @@
 /**
  * "Why this matters" explanations for findings.
  *
- * With an API key: Claude (Opus) writes grounded plain-English rationale in one batched call.
+ * With an API key: Vera (Opus) writes grounded plain-English rationale in one batched call.
  * Without one: tax-aware templates per anomaly type produce genuinely useful copy offline.
  * Detection/ranking is never in this path — explanations are layered on after the deterministic scan.
  */
 import type { Citation, ExplainResponse, Finding } from '../../shared/types.js';
-import { MODELS, claudeAvailable, temperatureParam } from './config.js';
-import { callClaude, firstToolInput, getClient } from './claude.js';
+import { MODELS, aiAvailable, temperatureParam } from './config.js';
+import { callVera, firstToolInput, getClient } from './ai.js';
 import { fmtMoney, fmtPct } from './engine/util.js';
 
 interface ExplanationParts {
@@ -171,7 +171,7 @@ const EXPLAIN_TOOL_SCHEMA = {
   required: ['explanations'],
 };
 
-interface ClaudeExplanation {
+interface VeraExplanation {
   finding_id: string;
   why_short: string;
   why_full?: string;
@@ -179,7 +179,7 @@ interface ClaudeExplanation {
   citation?: Citation;
 }
 
-async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): Promise<ClaudeExplanation[]> {
+async function veraExplain(findings: Finding[], verbosity: 'card' | 'full'): Promise<VeraExplanation[]> {
   const client = getClient();
   if (!client) throw new Error('no client');
   const compact = findings.map((f) => ({
@@ -194,12 +194,12 @@ async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): P
     reasons: f.reasons,
   }));
   const system =
-    'You are CoCounsel, assisting a US individual (Form 1040) tax preparer. For each finding, explain in plain ' +
+    'You are Vera, assisting a US individual (Form 1040) tax preparer. For each finding, explain in plain ' +
     'English WHY it matters and what it implies, grounded ONLY in the values provided. Never invent forms, line ' +
     'numbers, or dollar amounts not present. Keep why_short to at most 2 sentences. Include a citation to the ' +
     'relevant REAL IRS form or publication (e.g. "Schedule B (Form 1040)", "Pub 526") — never fabricate a source.' +
     (verbosity === 'full' ? ' Also provide a 2-4 sentence why_full and a concrete suggested_action.' : '');
-  return callClaude('explanations (/api/explain)', MODELS.explain, async () => {
+  return callVera('explanations (/api/explain)', MODELS.explain, async () => {
     const msg = await client.messages.create({
       model: MODELS.explain,
       max_tokens: 2048,
@@ -216,29 +216,29 @@ async function claudeExplain(findings: Finding[], verbosity: 'card' | 'full'): P
       tool_choice: { type: 'tool', name: 'emit_explanations' },
       messages: [{ role: 'user', content: `Findings:\n${JSON.stringify(compact, null, 2)}` }],
     });
-    const out = firstToolInput<{ explanations: ClaudeExplanation[] }>(msg);
+    const out = firstToolInput<{ explanations: VeraExplanation[] }>(msg);
     if (!out?.explanations) throw new Error('no explanations in response');
     return out.explanations;
   });
 }
 
-/** Answer a spoken follow-up about one finding — Claude when available, else a grounded template. */
-export async function answerFollowup(finding: Finding, question: string): Promise<{ answer: string; citation: Citation; answered_via: 'claude' | 'deterministic' }> {
+/** Answer a spoken follow-up about one finding — Vera when available, else a grounded template. */
+export async function answerFollowup(finding: Finding, question: string): Promise<{ answer: string; citation: Citation; answered_via: 'vera' | 'deterministic' }> {
   const citation = citationFor(finding);
   const t = templateExplain(finding);
   const q = (question || '').toLowerCase();
 
-  if (claudeAvailable()) {
+  if (aiAvailable()) {
     const client = getClient();
     try {
       if (client) {
-        const text = await callClaude('voice follow-up (/api/ask)', MODELS.explain, async () => {
+        const text = await callVera('voice follow-up (/api/ask)', MODELS.explain, async () => {
           const msg = await client.messages.create({
             model: MODELS.explain,
             max_tokens: 400,
             ...temperatureParam(),
             system:
-              'You are CoCounsel assisting a US tax preparer by voice. Answer the spoken follow-up about this single ' +
+              'You are Vera assisting a US tax preparer by voice. Answer the spoken follow-up about this single ' +
               'flagged line in <=3 sentences, grounded ONLY in the finding values. Cite a real IRS form/Pub; never invent numbers or sources.',
             messages: [
               {
@@ -260,7 +260,7 @@ export async function answerFollowup(finding: Finding, question: string): Promis
             .join(' ')
             .trim();
         });
-        if (text) return { answer: text, citation, answered_via: 'claude' };
+        if (text) return { answer: text, citation, answered_via: 'vera' };
       }
     } catch {
       /* fall through */
@@ -284,15 +284,15 @@ export async function explainFindings(
   findings: Finding[],
   verbosity: 'card' | 'full' = 'card',
 ): Promise<ExplainResponse> {
-  if (claudeAvailable()) {
+  if (aiAvailable()) {
     try {
-      const ex = await claudeExplain(findings, verbosity);
+      const ex = await veraExplain(findings, verbosity);
       const map = new Map(ex.map((e) => [e.finding_id, e]));
       return {
         explanations: findings.map((f) => {
           const hit = map.get(f.finding_id);
-          // Always hand the UI a clickable source: use Claude's citation only if it has a URL,
-          // otherwise fall back to our deterministic IRS link (Claude usually emits a label, no URL).
+          // Always hand the UI a clickable source: use Vera's citation only if it has a URL,
+          // otherwise fall back to our deterministic IRS link (Vera usually emits a label, no URL).
           if (hit) return { ...hit, citation: hit.citation?.url ? hit.citation : citationFor(f) };
           const t = templateExplain(f);
           return {

@@ -26,14 +26,14 @@ export class VarianceStore {
   summary = signal<ScanSummary | null>(null);
   loading = signal(false);
   scanning = signal(false);
-  claudeAvailable = signal(false);
+  aiAvailable = signal(false);
 
   // ---- config / interaction ----
   activeForm = signal('1040');
   ruleset = signal<Partial<RuleSet>>({ pct_threshold: 0.2 });
   overrides = signal<Record<string, number | null>>({});
   echoBack = signal<string | null>(null);
-  parsedVia = signal<'claude' | 'regex_fallback' | null>(null);
+  parsedVia = signal<'vera' | 'regex_fallback' | null>(null);
   jumpTarget = signal<string | null>(null);
   /** Set whenever an edit/threshold change adds or resolves a flag — drives the toast + card pulse. */
   changeToast = signal<{ kind: 'new' | 'resolved'; label: string; tier?: Tier; findingId?: string; at: number } | null>(null);
@@ -50,7 +50,7 @@ export class VarianceStore {
   private firstScanDone = false;
 
   init(): void {
-    this.api.health().subscribe((h) => this.claudeAvailable.set(h.claude_available));
+    this.api.health().subscribe((h) => this.aiAvailable.set(h.ai_available));
     this.api.taxpayers().subscribe((r) => this.availableTaxpayers.set(r.taxpayers));
     this.loadTaxpayer('johnson');
   }

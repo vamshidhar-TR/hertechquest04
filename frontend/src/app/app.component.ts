@@ -13,7 +13,7 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
       <header class="topbar">
         <div class="brand">
           <span class="tr">TR</span>
-          <span class="product">CoCounsel<span class="sub">Return-to-Return Variance Alerts</span></span>
+          <span class="product">VeriVance<span class="sub">Return-to-Return Variance Alerts</span></span>
         </div>
 
         <div class="client">
@@ -38,8 +38,8 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
         <span class="spacer"></span>
 
         <div class="status">
-          <span class="ai-pill" [class.on]="store.claudeAvailable()">
-            <span class="led"></span>{{ store.claudeAvailable() ? 'Claude live' : 'Offline · deterministic fallback' }}
+          <span class="ai-pill" [class.on]="store.aiAvailable()">
+            <span class="led"></span>{{ store.aiAvailable() ? 'Vera live' : 'Offline · deterministic fallback' }}
           </span>
         </div>
       </header>
@@ -50,14 +50,14 @@ import { NlConfigBarComponent } from './components/nl-config-bar.component';
             <span class="pane-title">{{ store.displayName() || 'Loading…' }}</span>
             <span class="pane-sub">Working return — edit any current-year value to re-scan live</span>
           </div>
-          <cc-return-grid />
+          <vv-return-grid />
         </section>
         <aside class="right">
-          <cc-alerts-panel />
+          <vv-alerts-panel />
         </aside>
       </main>
 
-      <cc-nl-config-bar />
+      <vv-nl-config-bar />
     </div>
   `,
   styles: [

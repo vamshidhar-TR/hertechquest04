@@ -5,13 +5,13 @@ import { VoiceService } from '../core/voice.service';
 import { AlertCardComponent } from './alert-card.component';
 
 @Component({
-  selector: 'cc-alerts-panel',
+  selector: 'vv-alerts-panel',
   standalone: true,
   imports: [AlertCardComponent],
   template: `
     <header class="summary">
       <div class="title-row">
-        <div class="cc-logo"><span class="dot"></span> CoCounsel</div>
+        <div class="vv-logo"><span class="dot"></span> Vera</div>
         @if (store.scanning()) {<span class="scanning"><span class="spin"></span> scanning…</span>}
         <span class="spacer"></span>
         @if (voice.ttsSupported) {
@@ -39,7 +39,7 @@ import { AlertCardComponent } from './alert-card.component';
 
     <div class="list">
       @for (f of visible(); track f.finding_id) {
-        <cc-alert-card [f]="f" [isNew]="store.changeToast()?.kind === 'new' && f.finding_id === store.changeToast()?.findingId" (jump)="store.jumpTo($event)" />
+        <vv-alert-card [f]="f" [isNew]="store.changeToast()?.kind === 'new' && f.finding_id === store.changeToast()?.findingId" (jump)="store.jumpTo($event)" />
       } @empty {
         <div class="empty">No alerts at this threshold. Lower it or load a return.</div>
       }
@@ -67,7 +67,7 @@ import { AlertCardComponent } from './alert-card.component';
         align-items: center;
         gap: 10px;
       }
-      .cc-logo {
+      .vv-logo {
         font-weight: 800;
         font-size: 14px;
         letter-spacing: -0.01em;
@@ -75,12 +75,12 @@ import { AlertCardComponent } from './alert-card.component';
         align-items: center;
         gap: 7px;
       }
-      .cc-logo .dot {
+      .vv-logo .dot {
         width: 9px;
         height: 9px;
         border-radius: 50%;
-        background: var(--cc);
-        box-shadow: 0 0 0 3px var(--cc-soft);
+        background: var(--vera);
+        box-shadow: 0 0 0 3px var(--vera-soft);
       }
       .scanning {
         font-size: 11px;
@@ -95,7 +95,7 @@ import { AlertCardComponent } from './alert-card.component';
         border: 2px solid var(--border-strong);
         border-top-color: var(--accent);
         border-radius: 50%;
-        animation: cc-spin 0.7s linear infinite;
+        animation: vv-spin 0.7s linear infinite;
       }
       .spacer {
         flex: 1;
@@ -110,9 +110,9 @@ import { AlertCardComponent } from './alert-card.component';
         font-weight: 600;
       }
       .hf.on {
-        color: var(--cc);
-        border-color: var(--cc);
-        background: var(--cc-soft);
+        color: var(--vera);
+        border-color: var(--vera);
+        background: var(--vera-soft);
       }
       .speaker {
         border: 1px solid var(--border-strong);

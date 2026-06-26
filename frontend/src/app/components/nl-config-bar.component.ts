@@ -4,7 +4,7 @@ import { VarianceStore } from '../core/variance.store';
 import { VoiceService } from '../core/voice.service';
 
 @Component({
-  selector: 'cc-nl-config-bar',
+  selector: 'vv-nl-config-bar',
   standalone: true,
   template: `
     <div class="bar">
@@ -49,8 +49,8 @@ import { VoiceService } from '../core/voice.service';
       <div class="echo">
         <span class="tick">✓</span>
         <span class="echo-text">{{ store.echoBack() }}</span>
-        <span class="via" [class.ai]="store.parsedVia() === 'claude'">
-          {{ store.parsedVia() === 'claude' ? 'parsed by Claude' : 'parsed offline' }}
+        <span class="via" [class.ai]="store.parsedVia() === 'vera'">
+          {{ store.parsedVia() === 'vera' ? 'parsed by Vera' : 'parsed offline' }}
         </span>
       </div>
     }
@@ -88,7 +88,7 @@ import { VoiceService } from '../core/voice.service';
         background: var(--crit-bg);
         color: var(--crit);
         border-color: var(--crit);
-        animation: cc-pulse 1.2s infinite;
+        animation: vv-pulse 1.2s infinite;
       }
       .nl-input {
         flex: 1;
@@ -103,9 +103,9 @@ import { VoiceService } from '../core/voice.service';
       }
       .nl-input:focus {
         outline: none;
-        border-color: var(--cc);
+        border-color: var(--vera);
         background: #fff;
-        box-shadow: 0 0 0 3px var(--cc-soft);
+        box-shadow: 0 0 0 3px var(--vera-soft);
       }
       .analyze {
         flex: 0 0 auto;
@@ -152,10 +152,10 @@ import { VoiceService } from '../core/voice.service';
         gap: 9px;
         font-size: 12.5px;
         color: var(--ink-soft);
-        background: var(--cc-soft);
+        background: var(--vera-soft);
         border-radius: 8px;
         padding: 7px 11px;
-        animation: cc-fade-in 0.2s ease both;
+        animation: vv-fade-in 0.2s ease both;
       }
       .tick {
         color: var(--good);
@@ -173,7 +173,7 @@ import { VoiceService } from '../core/voice.service';
         padding: 2px 8px;
       }
       .via.ai {
-        color: var(--cc);
+        color: var(--vera);
       }
     `,
   ],

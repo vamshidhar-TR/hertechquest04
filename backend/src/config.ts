@@ -15,8 +15,8 @@ export function getAnthropicBaseURL(): string | undefined {
   return process.env.ANTHROPIC_BASE_URL?.trim() || undefined;
 }
 
-/** Claude is optional — its absence flips the app to deterministic fallbacks. Either auth method counts. */
-export function claudeAvailable(): boolean {
+/** Vera is optional — its absence flips the app to deterministic fallbacks. Either auth method counts. */
+export function aiAvailable(): boolean {
   return Boolean(getAnthropicKey() || getAnthropicAuthToken());
 }
 

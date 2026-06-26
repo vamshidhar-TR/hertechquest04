@@ -1,6 +1,6 @@
 # Running the app
 
-CoCounsel · Return-to-Return Variance Alerts is a two-part app:
+VeriVance · Return-to-Return Variance Alerts is a two-part app:
 
 | Part | What it is | URL |
 |---|---|---|
@@ -67,11 +67,11 @@ collapse, and downstream effects. Try these:
 
 ---
 
-## Optional: turn on Claude
+## Optional: turn on Vera
 
 By default the AI features run on built-in deterministic fallbacks (template explanations + regex rule parsing) — the top-right pill reads *"Offline · deterministic fallback."*
 
-To enable Claude-powered explanations and natural-language parsing, set credentials **before** starting. Two options:
+To enable Vera-powered explanations and natural-language parsing, set credentials **before** starting. Two options:
 
 **A) Thomson Reuters LiteLLM gateway** (no direct Anthropic key — uses a bearer virtual key):
 
@@ -89,7 +89,7 @@ export ANTHROPIC_API_KEY=sk-ant-…
 ./run.sh
 ```
 
-The pill flips to *"Claude live."* Everything still works without either — credentials only enrich the wording. If a model name is rejected, set `ANTHROPIC_MODEL` (or `ANTHROPIC_MODEL_EXPLAIN` / `ANTHROPIC_MODEL_PARSE`) to whatever your gateway exposes.
+The pill flips to *"Vera live."* Everything still works without either — credentials only enrich the wording. If a model name is rejected, set `ANTHROPIC_MODEL` (or `ANTHROPIC_MODEL_EXPLAIN` / `ANTHROPIC_MODEL_PARSE`) to whatever your gateway exposes.
 
 ---
 

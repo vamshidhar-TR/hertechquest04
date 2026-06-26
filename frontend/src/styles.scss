@@ -1,11 +1,11 @@
-/* ===== CoCounsel · Variance Alerts — global design system ===== */
+/* ===== VeriVance · Variance Alerts — global design system ===== */
 :root {
   /* brand */
   --accent: #f26c21; /* Thomson Reuters orange */
   --accent-strong: #d9550f;
   --accent-soft: #fdf0e8;
-  --cc: #6b4ff5; /* CoCounsel assistant violet */
-  --cc-soft: #efebff;
+  --vera: #6b4ff5; /* Vera assistant violet */
+  --vera-soft: #efebff;
 
   /* surfaces */
   --bg: #f4f6f9;
@@ -101,7 +101,7 @@ input {
   background-clip: content-box;
 }
 
-@keyframes cc-pulse {
+@keyframes vv-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(242, 108, 33, 0.45);
   }
@@ -112,7 +112,7 @@ input {
     box-shadow: 0 0 0 0 rgba(242, 108, 33, 0);
   }
 }
-@keyframes cc-flash {
+@keyframes vv-flash {
   0%,
   100% {
     background: transparent;
@@ -121,7 +121,7 @@ input {
     background: var(--accent-soft);
   }
 }
-@keyframes cc-fade-in {
+@keyframes vv-fade-in {
   from {
     opacity: 0;
     transform: translateY(6px);
@@ -131,7 +131,7 @@ input {
     transform: none;
   }
 }
-@keyframes cc-spin {
+@keyframes vv-spin {
   to {
     transform: rotate(360deg);
   }
