@@ -4,7 +4,19 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class VoiceService {
   listening = signal(false);
+  /** Master mute for all spoken output (auto-summary, replay, Ask answers). */
+  muted = signal(false);
   private rec: any = null;
+
+  /** Stop any speech currently playing or queued. */
+  cancelSpeech(): void {
+    if (this.ttsSupported) window.speechSynthesis.cancel();
+  }
+
+  setMuted(m: boolean): void {
+    this.muted.set(m);
+    if (m) this.cancelSpeech(); // muting takes effect immediately, even mid-sentence
+  }
 
   get sttSupported(): boolean {
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -36,7 +48,7 @@ export class VoiceService {
   }
 
   speak(text: string): void {
-    if (!this.ttsSupported) return;
+    if (this.muted() || !this.ttsSupported) return;
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 1.03;
     u.pitch = 1;

@@ -15,10 +15,12 @@ import { AlertCardComponent } from './alert-card.component';
         @if (store.scanning()) {<span class="scanning"><span class="spin"></span> scanning…</span>}
         <span class="spacer"></span>
         @if (voice.ttsSupported) {
-          <button class="hf" [class.on]="store.handsFree()" (click)="store.handsFree.set(!store.handsFree())" title="Speak new alerts automatically">
+          <button class="hf" [class.on]="store.handsFree()" (click)="store.setHandsFree(!store.handsFree())" title="Speak new alerts automatically">
             {{ store.handsFree() ? '🔊 Hands-free' : '🔇 Muted' }}
           </button>
-          <button class="speaker" (click)="store.speakSummary()" title="Replay the spoken summary">↺</button>
+          @if (store.handsFree()) {
+            <button class="speaker" (click)="store.speakSummary()" title="Replay the spoken summary">↺</button>
+          }
         }
       </div>
       <div class="counts">

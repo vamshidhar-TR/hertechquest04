@@ -41,6 +41,12 @@ export class VarianceStore {
   // ---- voice ----
   handsFree = signal(true);
 
+  /** Toggle hands-free audio. Muting silences all spoken output immediately, mid-sentence included. */
+  setHandsFree(on: boolean): void {
+    this.handsFree.set(on);
+    this.voice.setMuted(!on);
+  }
+
   // ---- derived ----
   threshold = computed(() => this.ruleset().pct_threshold ?? 0.2);
   findingByPath = computed(() => new Map(this.findings().map((f) => [f.canonical_path, f])));
